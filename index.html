@@ -13,36 +13,36 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #fff;
             color: #1a1a1a;
-            line-height: 1.5;
-            padding: 20px 40px;
-            max-width: 1400px;
+            line-height: 1.4;
+            padding: 15px 30px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         
         header {
             border-bottom: 2px solid #1a1a1a;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
         }
         
-        h1 { font-size: 24px; font-weight: 600; margin-bottom: 5px; }
-        .subtitle { color: #666; font-size: 13px; }
+        h1 { font-size: 22px; font-weight: 600; margin-bottom: 3px; }
+        .subtitle { color: #666; font-size: 12px; }
         
         .top-section {
-            display: grid;
-            grid-template-columns: 1.8fr 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
         }
         
         .status {
             background: #f8f8f8;
             border-left: 3px solid #ffc107;
-            padding: 25px 30px;
+            padding: 15px 20px;
             display: grid;
-            grid-template-columns: 180px 1fr;
-            gap: 30px;
+            grid-template-columns: 140px 1fr;
+            gap: 20px;
             align-items: center;
+            flex: 2;
         }
         
         .metric-display {
@@ -50,74 +50,74 @@
         }
         
         .regime-label {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             color: #666;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
         
         .metric {
-            font-size: 48px;
+            font-size: 38px;
             font-weight: 300;
             color: #1a1a1a;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         
         .metric-sub {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
         }
         
         .interpretation {
-            font-size: 13px;
-            line-height: 1.5;
+            font-size: 12px;
+            line-height: 1.4;
         }
         
         .interpretation p {
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
         
         .signal {
             border-left: 3px solid #dc3545;
-            padding: 18px 20px;
+            padding: 12px 15px;
             background: #fafafa;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            flex: 1;
+            min-width: 260px;
         }
         
         .signal h3 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
         
         .signal p {
-            font-size: 13px;
-            margin-bottom: 8px;
-            line-height: 1.5;
+            font-size: 12px;
+            margin-bottom: 5px;
+            line-height: 1.4;
         }
         
         .warning { border-left-color: #ffc107; }
         
         h2 {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 8px;
+            padding-bottom: 5px;
         }
         
         details {
-            margin-bottom: 15px;
-            font-size: 13px;
+            margin-bottom: 10px;
+            font-size: 12px;
         }
         
         summary {
             font-weight: 600;
-            padding: 8px 0;
+            padding: 5px 0;
             color: #666;
             cursor: pointer;
+            font-size: 12px;
         }
         
         summary:hover { color: #1a1a1a; }
@@ -125,80 +125,97 @@
         .chart-section {
             display: grid;
             grid-template-columns: 3fr 1fr;
-            gap: 25px;
-            margin-bottom: 25px;
+            gap: 15px;
+            margin-bottom: 15px;
         }
         
         .scenarios {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
         
         .scenario {
             background: #fafafa;
-            padding: 15px;
+            padding: 12px;
             flex: 1;
         }
         
         .scenario h3 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
         
         .scenario p {
-            font-size: 13px;
-            margin-bottom: 8px;
+            font-size: 12px;
+            margin-bottom: 5px;
         }
         
         .scenario ul {
-            margin: 0 0 0 18px;
-            font-size: 13px;
+            margin: 0 0 0 15px;
+            font-size: 12px;
         }
         
         .scenario li {
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         
         .reference {
             background: #fafafa;
-            padding: 20px 25px;
-            margin-bottom: 20px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
         }
         
         .reference-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
+            gap: 20px;
         }
         
         .reference-item h3 {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
         
         .reference-item p, .reference-item ul {
-            font-size: 12px;
-            line-height: 1.5;
+            font-size: 11px;
+            line-height: 1.4;
         }
         
         .reference-item ul {
-            margin-left: 15px;
+            margin-left: 12px;
         }
         
         footer {
             border-top: 1px solid #e0e0e0;
-            padding-top: 15px;
+            padding-top: 10px;
             color: #666;
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
         }
         
         @media (max-width: 1200px) {
             .top-section {
+                flex-wrap: wrap;
+            }
+            .status {
+                flex: 1 1 100%;
+            }
+            .signal {
+                flex: 1 1 45%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .top-section {
+                flex-direction: column;
+            }
+            .status {
                 grid-template-columns: 1fr;
+                gap: 10px;
             }
             .chart-section {
                 grid-template-columns: 1fr;
@@ -206,19 +223,8 @@
             .scenarios {
                 flex-direction: row;
             }
-        }
-        
-        @media (max-width: 768px) {
-            body { padding: 15px; }
-            .status {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
             .reference-grid {
                 grid-template-columns: 1fr;
-            }
-            .scenarios {
-                flex-direction: column;
             }
         }
     </style>
@@ -259,7 +265,7 @@
     
     <details>
         <summary>What is margin debt?</summary>
-        <div style="padding: 10px 0;">
+        <div style="padding: 8px 0;">
             <p>Money investors borrow from brokers to buy stocks. Rising = confidence/risk-taking. Falling = deleveraging. Peaks often precede market tops (2000, 2007, 2021).</p>
         </div>
     </details>
@@ -268,18 +274,18 @@
     
     <details>
         <summary>How to read this chart</summary>
-        <div style="padding: 10px 0;">
+        <div style="padding: 8px 0;">
             <p>Blue line = YoY growth. Red dot = current. Above 0% = expansion. Below 0% = contraction. Above 30% = late-cycle. Above 60% = extreme.</p>
         </div>
     </details>
     
     <div class="chart-section">
-        <div id="main-chart" style="height: 450px;"></div>
+        <div id="main-chart" style="height: 350px;"></div>
         
         <div class="scenarios">
             <div class="scenario">
                 <h3>Baseline (70%)</h3>
-                <p style="margin-bottom: 6px;">Gradual normalization</p>
+                <p style="margin-bottom: 4px;">Gradual normalization</p>
                 <ul>
                     <li>Cools to 10-15%</li>
                     <li>No crash, reversion</li>
@@ -289,7 +295,7 @@
             
             <div class="scenario">
                 <h3>Risk (30%)</h3>
-                <p style="margin-bottom: 6px;">Spike then reversal</p>
+                <p style="margin-bottom: 4px;">Spike then reversal</p>
                 <ul>
                     <li>Spike to 50-60%</li>
                     <li>Sharp decline</li>
@@ -384,17 +390,17 @@
                     ],
                     annotations: [
                         {x: dates[50], y: 31, text: '30%', showarrow: false, 
-                         font: {color: '#999', size: 10}},
+                         font: {color: '#999', size: 9}},
                         {x: dates[50], y: 61, text: '60%', showarrow: false, 
-                         font: {color: '#999', size: 10}}
+                         font: {color: '#999', size: 9}}
                     ],
                     showlegend: false,
-                    margin: {t: 10, b: 40, l: 50, r: 10},
+                    margin: {t: 5, b: 35, l: 45, r: 10},
                     xaxis: {title: '', showgrid: false},
                     yaxis: {title: 'YoY Growth (%)', showgrid: true, gridcolor: '#f0f0f0'},
                     plot_bgcolor: '#fff',
                     paper_bgcolor: '#fff',
-                    font: {family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', size: 11}
+                    font: {family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', size: 10}
                 };
                 
                 Plotly.newPlot('main-chart', [trace1, trace2], layout, {responsive: true, displayModeBar: false});
