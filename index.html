@@ -13,180 +13,185 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #fff;
             color: #1a1a1a;
-            line-height: 1.6;
-            padding: 40px 20px;
-            max-width: 900px;
+            line-height: 1.5;
+            padding: 20px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
         header {
             border-bottom: 2px solid #1a1a1a;
-            padding-bottom: 20px;
-            margin-bottom: 40px;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
         }
         
-        h1 {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-        }
+        h1 { font-size: 24px; font-weight: 600; margin-bottom: 5px; }
+        .subtitle { color: #666; font-size: 13px; }
         
         .status {
             background: #f8f8f8;
             border-left: 3px solid #ffc107;
-            padding: 30px;
-            margin: 40px 0;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 25px;
+            align-items: start;
         }
         
-        .status h2 {
-            font-size: 20px;
+        .metric-display {
+            text-align: center;
+        }
+        
+        .regime-label {
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 20px;
+            color: #666;
+            margin-bottom: 8px;
         }
         
         .metric {
-            font-size: 48px;
+            font-size: 42px;
             font-weight: 300;
             color: #1a1a1a;
-            margin: 20px 0;
+            margin-bottom: 3px;
+        }
+        
+        .metric-sub {
+            font-size: 12px;
+            color: #999;
         }
         
         .interpretation {
-            margin-top: 20px;
-            line-height: 1.8;
+            font-size: 14px;
+            line-height: 1.6;
         }
         
         .interpretation p {
-            margin-bottom: 12px;
-        }
-        
-        section {
-            margin: 60px 0;
+            margin-bottom: 8px;
         }
         
         h2 {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
         
         .signals {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 30px 0;
+            gap: 15px;
+            margin-bottom: 25px;
         }
         
         .signal {
             border-left: 3px solid #dc3545;
-            padding: 20px;
+            padding: 15px;
             background: #fafafa;
         }
         
         .signal h3 {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
         
         .signal p {
-            margin-bottom: 10px;
-            font-size: 14px;
+            font-size: 13px;
+            margin-bottom: 6px;
+            line-height: 1.4;
         }
         
-        .warning {
-            border-left-color: #ffc107;
-        }
+        .warning { border-left-color: #ffc107; }
         
         details {
-            margin: 20px 0;
-            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: 13px;
         }
         
         summary {
             font-weight: 600;
-            padding: 10px 0;
+            padding: 8px 0;
             color: #666;
+            cursor: pointer;
         }
         
-        summary:hover {
-            color: #1a1a1a;
-        }
+        summary:hover { color: #1a1a1a; }
         
         .scenarios {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 30px 0;
+            gap: 15px;
+            margin-bottom: 25px;
         }
         
         .scenario {
             background: #fafafa;
-            padding: 25px;
+            padding: 15px;
         }
         
         .scenario h3 {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .scenario p {
+            font-size: 13px;
+            margin-bottom: 8px;
         }
         
         .scenario ul {
-            margin: 15px 0 15px 20px;
+            margin: 8px 0 0 18px;
+            font-size: 13px;
         }
         
         .scenario li {
-            margin-bottom: 8px;
-            font-size: 14px;
+            margin-bottom: 4px;
         }
         
         .reference {
             background: #fafafa;
-            padding: 30px;
-            margin: 40px 0;
+            padding: 20px;
+            margin-bottom: 20px;
         }
         
         .reference-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-top: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
         }
         
         .reference-item h3 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 10px;
-            border: none;
-            padding: 0;
+            margin-bottom: 8px;
         }
         
         .reference-item p, .reference-item ul {
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 12px;
+            line-height: 1.5;
         }
         
         .reference-item ul {
-            margin-left: 20px;
+            margin-left: 15px;
         }
         
         footer {
             border-top: 1px solid #e0e0e0;
-            padding-top: 20px;
-            margin-top: 60px;
+            padding-top: 15px;
             color: #666;
-            font-size: 13px;
+            font-size: 12px;
             text-align: center;
         }
         
         @media (max-width: 768px) {
+            .status {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
             .signals, .scenarios, .reference-grid {
                 grid-template-columns: 1fr;
             }
@@ -200,98 +205,80 @@
     </header>
     
     <div class="status">
-        <h2>Late-Cycle Expansion</h2>
-        <div class="metric">+36.3%</div>
-        <p style="color: #666; font-size: 14px;">year-over-year growth</p>
+        <div class="metric-display">
+            <div class="regime-label">Late-Cycle Expansion</div>
+            <div class="metric">+36.3%</div>
+            <div class="metric-sub">year-over-year</div>
+        </div>
         
         <div class="interpretation">
-            <p><strong>Current position:</strong> Near the end of a growth phase.</p>
-            <p><strong>Risk:</strong> Elevated. History suggests this level typically reverts to 10-15% within six months.</p>
-            <p><strong>Outlook:</strong> Growth is decelerating and we're in the top 10% historically. Watch for continued slowdown.</p>
+            <p><strong>Position:</strong> Near the end of a growth phase.</p>
+            <p><strong>Risk:</strong> Elevated. Typically reverts to 10-15% within six months.</p>
+            <p><strong>Outlook:</strong> Decelerating. Top 10% historically.</p>
         </div>
     </div>
     
     <details>
         <summary>What is margin debt?</summary>
-        <div style="padding: 15px 0;">
-            <p>Margin debt is money investors borrow from brokers to buy stocks. When margin debt grows rapidly, it signals increasing leverage and risk-taking. When it falls, investors are reducing exposure.</p>
-            
-            <p style="margin-top: 15px;"><strong>Why it matters:</strong></p>
-            <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
-                <li>Rising margin debt = investors confident, taking more risk</li>
-                <li>Peak margin debt = often precedes market tops (2000, 2007, 2021)</li>
-                <li>Falling margin debt = deleveraging, often near bottoms</li>
-            </ul>
+        <div style="padding: 10px 0;">
+            <p>Money investors borrow from brokers to buy stocks. Rising = confidence/risk-taking. Falling = deleveraging. Peaks often precede market tops (2000, 2007, 2021).</p>
         </div>
     </details>
     
-    <section>
-        <h2>Key Indicators</h2>
-        
-        <div class="signals">
-            <div class="signal">
-                <h3>Deceleration</h3>
-                <p>Growth is still positive but slowing. The rate of increase is declining.</p>
-                <p><strong>Historical context:</strong> This pattern appeared before major peaks in 2000, 2007, and 2021.</p>
-            </div>
-            
-            <div class="signal warning">
-                <h3>Elevated Levels</h3>
-                <p>Current growth is in the 90th percentile since 1997. There's more room to fall than to rise.</p>
-                <p><strong>Typical outcome:</strong> Mean reversion to 10-15% growth over 6 months.</p>
-            </div>
-        </div>
-    </section>
+    <h2>Key Indicators</h2>
     
-    <section>
-        <h2>Historical Context</h2>
-        
-        <details>
-            <summary>How to read this chart</summary>
-            <div style="padding: 15px 0;">
-                <p>The blue line shows year-over-year growth in margin debt. The red marker shows current position.</p>
-                <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
-                    <li>Above 0% = expansion (investors adding leverage)</li>
-                    <li>Below 0% = contraction (deleveraging)</li>
-                    <li>Above 30% = late-cycle territory</li>
-                    <li>Above 60% = extreme conditions</li>
-                </ul>
-            </div>
-        </details>
-        
-        <div id="main-chart" style="height: 500px; margin-top: 30px;"></div>
-    </section>
-    
-    <section>
-        <h2>What Typically Happens Next</h2>
-        
-        <p style="margin-bottom: 30px;">Based on 18 historical periods with similar conditions (30-45% growth):</p>
-        
-        <div class="scenarios">
-            <div class="scenario">
-                <h3>Baseline (70% probability)</h3>
-                <p>Gradual normalization over six months</p>
-                <ul>
-                    <li>Growth cools to 10-15%</li>
-                    <li>No crash, just reversion</li>
-                    <li>Historical average: 11.7% after 6 months</li>
-                </ul>
-            </div>
-            
-            <div class="scenario">
-                <h3>Risk (30% probability)</h3>
-                <p>Acceleration then reversal</p>
-                <ul>
-                    <li>Initial spike to 50-60%</li>
-                    <li>Followed by sharp decline</li>
-                    <li>Seen in 2000, 2007, 2021</li>
-                </ul>
-            </div>
+    <div class="signals">
+        <div class="signal">
+            <h3>Deceleration</h3>
+            <p>Growth is positive but slowing. Rate of increase declining.</p>
+            <p><strong>Context:</strong> Pattern seen before 2000, 2007, 2021 peaks.</p>
         </div>
-    </section>
+        
+        <div class="signal warning">
+            <h3>Elevated Levels</h3>
+            <p>90th percentile since 1997. More room to fall than rise.</p>
+            <p><strong>Typical:</strong> Mean reversion to 10-15% over 6 months.</p>
+        </div>
+    </div>
+    
+    <h2>Historical Context</h2>
+    
+    <details>
+        <summary>How to read this chart</summary>
+        <div style="padding: 10px 0;">
+            <p>Blue line = YoY growth. Red dot = current. Above 0% = expansion. Below 0% = contraction. Above 30% = late-cycle. Above 60% = extreme.</p>
+        </div>
+    </details>
+    
+    <div id="main-chart" style="height: 400px; margin-bottom: 25px;"></div>
+    
+    <h2>What Typically Happens Next</h2>
+    
+    <p style="margin-bottom: 15px; font-size: 13px;">Based on 18 historical periods with similar conditions (30-45% growth):</p>
+    
+    <div class="scenarios">
+        <div class="scenario">
+            <h3>Baseline (70%)</h3>
+            <p>Gradual normalization</p>
+            <ul>
+                <li>Cools to 10-15%</li>
+                <li>No crash, just reversion</li>
+                <li>Avg: 11.7% after 6 months</li>
+            </ul>
+        </div>
+        
+        <div class="scenario">
+            <h3>Risk (30%)</h3>
+            <p>Acceleration then reversal</p>
+            <ul>
+                <li>Spike to 50-60%</li>
+                <li>Sharp decline follows</li>
+                <li>Seen in 2000, 2007, 2021</li>
+            </ul>
+        </div>
+    </div>
     
     <div class="reference">
-        <h2>Reference</h2>
         <div class="reference-grid">
             <div class="reference-item">
                 <h3>Cycle Phases</h3>
@@ -305,18 +292,18 @@
             
             <div class="reference-item">
                 <h3>Current Status</h3>
-                <p>36.3% growth places us firmly in late-cycle territory. Deceleration is active.</p>
+                <p>36.3% growth = late-cycle. Deceleration active.</p>
             </div>
             
             <div class="reference-item">
                 <h3>Data Source</h3>
-                <p>FINRA margin debt statistics, 1997-2025. Updated monthly.</p>
+                <p>FINRA margin statistics, 1997-2025. Updated monthly.</p>
             </div>
         </div>
     </div>
     
     <footer>
-        <p>Margin debt is a leading indicator, not a trading signal. Use this data as one input among many for risk assessment.</p>
+        <p>Leading indicator, not a trading signal. One input among many for risk assessment.</p>
     </footer>
     
     <script>
@@ -356,7 +343,7 @@
                     x: [dates[dates.length-1]],
                     y: [yoy[yoy.length-1]],
                     mode: 'markers',
-                    marker: {size: 10, color: '#dc3545', line: {width: 2, color: '#1a1a1a'}},
+                    marker: {size: 8, color: '#dc3545', line: {width: 2, color: '#1a1a1a'}},
                     name: 'Current'
                 };
                 
@@ -371,17 +358,17 @@
                     ],
                     annotations: [
                         {x: dates[50], y: 31, text: '30%', showarrow: false, 
-                         font: {color: '#999', size: 10}},
+                         font: {color: '#999', size: 9}},
                         {x: dates[50], y: 61, text: '60%', showarrow: false, 
-                         font: {color: '#999', size: 10}}
+                         font: {color: '#999', size: 9}}
                     ],
                     showlegend: false,
-                    margin: {t: 20, b: 60, l: 60, r: 20},
+                    margin: {t: 10, b: 40, l: 50, r: 20},
                     xaxis: {title: '', showgrid: false},
                     yaxis: {title: 'YoY Growth (%)', showgrid: true, gridcolor: '#f0f0f0'},
                     plot_bgcolor: '#fff',
                     paper_bgcolor: '#fff',
-                    font: {family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'}
+                    font: {family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', size: 11}
                 };
                 
                 Plotly.newPlot('main-chart', [trace1, trace2], layout, {responsive: true, displayModeBar: false});
@@ -389,7 +376,7 @@
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('main-chart').innerHTML = 
-                    '<p style="color: #999; text-align: center; padding: 50px;">Chart unavailable. Ensure regime_history.csv is present.</p>';
+                    '<p style="color: #999; text-align: center; padding: 50px;">Chart unavailable.</p>';
             }
         }
         
