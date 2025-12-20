@@ -14,8 +14,8 @@
             background: #fff;
             color: #1a1a1a;
             line-height: 1.5;
-            padding: 20px;
-            max-width: 1000px;
+            padding: 20px 40px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
@@ -28,15 +28,21 @@
         h1 { font-size: 24px; font-weight: 600; margin-bottom: 5px; }
         .subtitle { color: #666; font-size: 13px; }
         
+        .top-section {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
         .status {
             background: #f8f8f8;
             border-left: 3px solid #ffc107;
-            padding: 20px;
-            margin-bottom: 25px;
+            padding: 25px 30px;
             display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 25px;
-            align-items: start;
+            grid-template-columns: 180px 1fr;
+            gap: 30px;
+            align-items: center;
         }
         
         .metric-display {
@@ -51,7 +57,7 @@
         }
         
         .metric {
-            font-size: 42px;
+            font-size: 48px;
             font-weight: 300;
             color: #1a1a1a;
             margin-bottom: 3px;
@@ -63,13 +69,36 @@
         }
         
         .interpretation {
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.5;
         }
         
         .interpretation p {
             margin-bottom: 8px;
         }
+        
+        .signal {
+            border-left: 3px solid #dc3545;
+            padding: 18px 20px;
+            background: #fafafa;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .signal h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .signal p {
+            font-size: 13px;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .warning { border-left-color: #ffc107; }
         
         h2 {
             font-size: 16px;
@@ -78,33 +107,6 @@
             border-bottom: 1px solid #e0e0e0;
             padding-bottom: 8px;
         }
-        
-        .signals {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .signal {
-            border-left: 3px solid #dc3545;
-            padding: 15px;
-            background: #fafafa;
-        }
-        
-        .signal h3 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        
-        .signal p {
-            font-size: 13px;
-            margin-bottom: 6px;
-            line-height: 1.4;
-        }
-        
-        .warning { border-left-color: #ffc107; }
         
         details {
             margin-bottom: 15px;
@@ -120,16 +122,23 @@
         
         summary:hover { color: #1a1a1a; }
         
-        .scenarios {
+        .chart-section {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 3fr 1fr;
+            gap: 25px;
             margin-bottom: 25px;
+        }
+        
+        .scenarios {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
         .scenario {
             background: #fafafa;
             padding: 15px;
+            flex: 1;
         }
         
         .scenario h3 {
@@ -144,24 +153,24 @@
         }
         
         .scenario ul {
-            margin: 8px 0 0 18px;
+            margin: 0 0 0 18px;
             font-size: 13px;
         }
         
         .scenario li {
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         
         .reference {
             background: #fafafa;
-            padding: 20px;
+            padding: 20px 25px;
             margin-bottom: 20px;
         }
         
         .reference-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
         }
         
         .reference-item h3 {
@@ -187,13 +196,29 @@
             text-align: center;
         }
         
+        @media (max-width: 1200px) {
+            .top-section {
+                grid-template-columns: 1fr;
+            }
+            .chart-section {
+                grid-template-columns: 1fr;
+            }
+            .scenarios {
+                flex-direction: row;
+            }
+        }
+        
         @media (max-width: 768px) {
+            body { padding: 15px; }
             .status {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
-            .signals, .scenarios, .reference-grid {
+            .reference-grid {
                 grid-template-columns: 1fr;
+            }
+            .scenarios {
+                flex-direction: column;
             }
         }
     </style>
@@ -204,17 +229,31 @@
         <p class="subtitle">Last updated: November 2025</p>
     </header>
     
-    <div class="status">
-        <div class="metric-display">
-            <div class="regime-label">Late-Cycle Expansion</div>
-            <div class="metric">+36.3%</div>
-            <div class="metric-sub">year-over-year</div>
+    <div class="top-section">
+        <div class="status">
+            <div class="metric-display">
+                <div class="regime-label">Late-Cycle Expansion</div>
+                <div class="metric">+36.3%</div>
+                <div class="metric-sub">year-over-year</div>
+            </div>
+            
+            <div class="interpretation">
+                <p><strong>Position:</strong> Near the end of a growth phase.</p>
+                <p><strong>Risk:</strong> Elevated. Typically reverts to 10-15% within six months.</p>
+                <p><strong>Outlook:</strong> Decelerating. Top 10% historically.</p>
+            </div>
         </div>
         
-        <div class="interpretation">
-            <p><strong>Position:</strong> Near the end of a growth phase.</p>
-            <p><strong>Risk:</strong> Elevated. Typically reverts to 10-15% within six months.</p>
-            <p><strong>Outlook:</strong> Decelerating. Top 10% historically.</p>
+        <div class="signal">
+            <h3>Growth Deceleration</h3>
+            <p>Margin debt is still growing year-over-year, but the rate of growth is slowing down. The second derivative (rate of change of the growth rate) is -7.8, indicating negative acceleration.</p>
+            <p>This deceleration pattern historically appears before major market peaks, as seen in 2000, 2007, and 2021.</p>
+        </div>
+        
+        <div class="signal warning">
+            <h3>Elevated Growth Levels</h3>
+            <p>Current year-over-year growth of 36.3% is in the 90th percentile of all readings since 1997. This means only 10% of historical periods showed higher growth rates.</p>
+            <p>From this percentile level, margin debt growth typically mean-reverts to 10-15% within six months as investors reduce leverage.</p>
         </div>
     </div>
     
@@ -225,22 +264,6 @@
         </div>
     </details>
     
-    <h2>Key Indicators</h2>
-    
-    <div class="signals">
-        <div class="signal">
-            <h3>Deceleration</h3>
-            <p>Growth is positive but slowing. Rate of increase declining.</p>
-            <p><strong>Context:</strong> Pattern seen before 2000, 2007, 2021 peaks.</p>
-        </div>
-        
-        <div class="signal warning">
-            <h3>Elevated Levels</h3>
-            <p>90th percentile since 1997. More room to fall than rise.</p>
-            <p><strong>Typical:</strong> Mean reversion to 10-15% over 6 months.</p>
-        </div>
-    </div>
-    
     <h2>Historical Context</h2>
     
     <details>
@@ -250,31 +273,29 @@
         </div>
     </details>
     
-    <div id="main-chart" style="height: 400px; margin-bottom: 25px;"></div>
-    
-    <h2>What Typically Happens Next</h2>
-    
-    <p style="margin-bottom: 15px; font-size: 13px;">Based on 18 historical periods with similar conditions (30-45% growth):</p>
-    
-    <div class="scenarios">
-        <div class="scenario">
-            <h3>Baseline (70%)</h3>
-            <p>Gradual normalization</p>
-            <ul>
-                <li>Cools to 10-15%</li>
-                <li>No crash, just reversion</li>
-                <li>Avg: 11.7% after 6 months</li>
-            </ul>
-        </div>
+    <div class="chart-section">
+        <div id="main-chart" style="height: 450px;"></div>
         
-        <div class="scenario">
-            <h3>Risk (30%)</h3>
-            <p>Acceleration then reversal</p>
-            <ul>
-                <li>Spike to 50-60%</li>
-                <li>Sharp decline follows</li>
-                <li>Seen in 2000, 2007, 2021</li>
-            </ul>
+        <div class="scenarios">
+            <div class="scenario">
+                <h3>Baseline (70%)</h3>
+                <p style="margin-bottom: 6px;">Gradual normalization</p>
+                <ul>
+                    <li>Cools to 10-15%</li>
+                    <li>No crash, reversion</li>
+                    <li>Avg: 11.7% (6M)</li>
+                </ul>
+            </div>
+            
+            <div class="scenario">
+                <h3>Risk (30%)</h3>
+                <p style="margin-bottom: 6px;">Spike then reversal</p>
+                <ul>
+                    <li>Spike to 50-60%</li>
+                    <li>Sharp decline</li>
+                    <li>2000, 2007, 2021</li>
+                </ul>
+            </div>
         </div>
     </div>
     
@@ -283,27 +304,32 @@
             <div class="reference-item">
                 <h3>Cycle Phases</h3>
                 <ul>
-                    <li>0-20%: Early-cycle</li>
-                    <li>20-30%: Mid-cycle</li>
-                    <li>30-60%: Late-cycle</li>
+                    <li>0-20%: Early</li>
+                    <li>20-30%: Mid</li>
+                    <li>30-60%: Late</li>
                     <li>60%+: Extreme</li>
                 </ul>
             </div>
             
             <div class="reference-item">
-                <h3>Current Status</h3>
+                <h3>Current</h3>
                 <p>36.3% growth = late-cycle. Deceleration active.</p>
             </div>
             
             <div class="reference-item">
                 <h3>Data Source</h3>
-                <p>FINRA margin statistics, 1997-2025. Updated monthly.</p>
+                <p>FINRA margin statistics, 1997-2025.</p>
+            </div>
+            
+            <div class="reference-item">
+                <h3>Update</h3>
+                <p>Monthly, mid-month.</p>
             </div>
         </div>
     </div>
     
     <footer>
-        <p>Leading indicator, not a trading signal. One input among many for risk assessment.</p>
+        <p>Leading indicator, not a trading signal. One input for risk assessment.</p>
     </footer>
     
     <script>
@@ -358,12 +384,12 @@
                     ],
                     annotations: [
                         {x: dates[50], y: 31, text: '30%', showarrow: false, 
-                         font: {color: '#999', size: 9}},
+                         font: {color: '#999', size: 10}},
                         {x: dates[50], y: 61, text: '60%', showarrow: false, 
-                         font: {color: '#999', size: 9}}
+                         font: {color: '#999', size: 10}}
                     ],
                     showlegend: false,
-                    margin: {t: 10, b: 40, l: 50, r: 20},
+                    margin: {t: 10, b: 40, l: 50, r: 10},
                     xaxis: {title: '', showgrid: false},
                     yaxis: {title: 'YoY Growth (%)', showgrid: true, gridcolor: '#f0f0f0'},
                     plot_bgcolor: '#fff',
