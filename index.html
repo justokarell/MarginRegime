@@ -4,45 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Margin Debt Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #fff;
+            font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fafafa;
             color: #1a1a1a;
-            line-height: 1.4;
-            padding: 15px 30px;
+            line-height: 1.3;
+            padding: 12px 25px;
             max-width: 1600px;
             margin: 0 auto;
         }
         
         header {
             border-bottom: 2px solid #1a1a1a;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
         
-        h1 { font-size: 22px; font-weight: 600; margin-bottom: 3px; }
-        .subtitle { color: #666; font-size: 12px; }
+        h1 { font-size: 20px; font-weight: 600; margin-bottom: 2px; letter-spacing: -0.02em; }
+        .subtitle { color: #666; font-size: 11px; }
         
         .top-section {
             display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         
         .status {
-            background: #f8f8f8;
+            background: #fff;
             border-left: 3px solid #ffc107;
-            padding: 15px 20px;
+            padding: 12px 15px;
             display: grid;
-            grid-template-columns: 140px 1fr;
-            gap: 20px;
+            grid-template-columns: 120px 1fr;
+            gap: 15px;
             align-items: center;
             flex: 2;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .metric-display {
@@ -50,107 +54,121 @@
         }
         
         .regime-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #666;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
         }
         
         .metric {
-            font-size: 38px;
+            font-size: 32px;
             font-weight: 300;
             color: #1a1a1a;
             margin-bottom: 2px;
+            letter-spacing: -0.03em;
         }
         
         .metric-sub {
-            font-size: 11px;
+            font-size: 10px;
             color: #999;
         }
         
         .interpretation {
-            font-size: 12px;
+            font-size: 11px;
             line-height: 1.4;
         }
         
         .interpretation p {
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
         
         .signal {
             border-left: 3px solid #dc3545;
-            padding: 12px 15px;
-            background: #fafafa;
+            padding: 10px 12px;
+            background: #fff;
             flex: 1;
-            min-width: 260px;
+            min-width: 240px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .signal h3 {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
+            letter-spacing: -0.01em;
         }
         
         .signal p {
-            font-size: 12px;
-            margin-bottom: 5px;
-            line-height: 1.4;
+            font-size: 11px;
+            margin-bottom: 4px;
+            line-height: 1.35;
         }
         
         .warning { border-left-color: #ffc107; }
         
         details {
-            margin-bottom: 10px;
-            font-size: 12px;
+            margin-bottom: 8px;
+            font-size: 11px;
         }
         
         summary {
             font-weight: 600;
-            padding: 5px 0;
+            padding: 4px 0;
             color: #666;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
         }
         
         summary:hover { color: #1a1a1a; }
         
         .chart-section {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
         h2 {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            margin: 20px 0 10px 0;
-            padding-bottom: 5px;
+            margin: 12px 0 6px 0;
+            padding-bottom: 4px;
             border-bottom: 1px solid #e0e0e0;
+            letter-spacing: -0.02em;
+        }
+        
+        .chart-subtitle {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 10px;
+            line-height: 1.4;
         }
         
         .threshold-info {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-top: 15px;
-            font-size: 12px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            font-size: 11px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .threshold-info h4 {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
         }
         
         .threshold-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 8px;
         }
         
         .threshold-item {
-            padding: 10px;
-            border-radius: 6px;
+            padding: 8px;
+            border-radius: 4px;
         }
         
         .threshold-item.late-cycle {
@@ -164,49 +182,52 @@
         }
         
         .threshold-item h5 {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
         }
         
         .threshold-item p {
-            font-size: 11px;
-            line-height: 1.4;
-            margin-bottom: 4px;
+            font-size: 10px;
+            line-height: 1.35;
+            margin-bottom: 3px;
         }
         
         .reference {
-            background: #fafafa;
-            padding: 12px 15px;
-            margin-bottom: 10px;
+            background: #fff;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .reference-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 15px;
         }
         
         .reference-item h3 {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
         }
         
         .reference-item p, .reference-item ul {
-            font-size: 11px;
-            line-height: 1.4;
+            font-size: 10px;
+            line-height: 1.3;
         }
         
         .reference-item ul {
-            margin-left: 12px;
+            margin-left: 10px;
         }
         
         footer {
             border-top: 1px solid #e0e0e0;
-            padding-top: 10px;
+            padding-top: 8px;
             color: #666;
-            font-size: 11px;
+            font-size: 10px;
             text-align: center;
         }
         
@@ -283,15 +304,10 @@
     
     <h2>Regime Forecast Analysis</h2>
     
-    <details>
-        <summary>How to read the forecast chart</summary>
-        <div style="padding: 8px 0;">
-            <p>This chart shows historical YoY growth with regime zones and predicted next states. Hover over any point to see the top 5 predicted outcomes and their probabilities. Background colors indicate regime zones: Green (Expansion), Light Blue (Growth), Orange (Cooling), Red (Decline).</p>
-        </div>
-    </details>
+    <p class="chart-subtitle">Historical YoY growth with regime zones and predicted next states. Hover over any point to see top 5 predicted outcomes and probabilities. Background colors: Green (Expansion), Blue (Growth), Orange (Cooling), Red (Decline).</p>
     
     <div class="chart-section">
-        <div id="forecast-chart" style="height: 700px;"></div>
+        <div id="forecast-chart" style="height: 520px;"></div>
     </div>
     
     <div class="threshold-info">
@@ -434,44 +450,44 @@
                 ],
                 annotations: [
                     {x: dates[dates.length - 10], y: 32, text: 'Expansion (+30%)', 
-                     showarrow: false, xanchor: 'right', font: {size: 11, color: '#059669', family: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif', weight: 500}},
+                     showarrow: false, xanchor: 'right', font: {size: 10, color: '#059669', family: 'Space Grotesk, sans-serif', weight: 500}},
                     {x: dates[dates.length - 10], y: -32, text: 'Decline (-30%)', 
-                     showarrow: false, xanchor: 'right', font: {size: 11, color: '#dc2626', family: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif', weight: 500}}
+                     showarrow: false, xanchor: 'right', font: {size: 10, color: '#dc2626', family: 'Space Grotesk, sans-serif', weight: 500}}
                 ],
                 title: {
                     text: 'Margin Debt Regime Analysis - YoY% Growth & Predicted Next Regime', 
-                    font: {size: 16, family: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif', weight: 600, color: '#0f172a'}
+                    font: {size: 15, family: 'Space Grotesk, Inter, sans-serif', weight: 600, color: '#0f172a'}
                 },
                 xaxis: {
-                    title: {text: 'Date', font: {size: 13, family: 'Inter, sans-serif', color: '#475569'}},
+                    title: {text: 'Date', font: {size: 12, family: 'Space Grotesk, sans-serif', color: '#475569'}},
                     showgrid: false,
                     showline: true,
                     linecolor: '#e2e8f0',
                     linewidth: 2,
-                    tickfont: {size: 11, family: 'Inter, sans-serif', color: '#64748b'}
+                    tickfont: {size: 10, family: 'Space Grotesk, sans-serif', color: '#64748b'}
                 },
                 yaxis: {
-                    title: {text: 'YoY% Change', font: {size: 13, family: 'Inter, sans-serif', color: '#475569'}},
+                    title: {text: 'YoY% Change', font: {size: 12, family: 'Space Grotesk, sans-serif', color: '#475569'}},
                     showgrid: true,
                     gridcolor: '#f1f5f9',
                     gridwidth: 1,
                     showline: true,
                     linecolor: '#e2e8f0',
                     linewidth: 2,
-                    tickfont: {size: 11, family: 'Inter, sans-serif', color: '#64748b'},
+                    tickfont: {size: 10, family: 'Space Grotesk, sans-serif', color: '#64748b'},
                     zeroline: false
                 },
                 hovermode: 'x unified',
                 hoverlabel: {
                     bgcolor: '#ffffff',
                     bordercolor: '#e2e8f0',
-                    font: {size: 12, family: 'Inter, sans-serif', color: '#1e293b'}
+                    font: {size: 11, family: 'Space Grotesk, sans-serif', color: '#1e293b'}
                 },
                 showlegend: true,
                 plot_bgcolor: '#ffffff',
-                paper_bgcolor: '#ffffff',
-                height: 700,
-                margin: {l: 60, r: 30, t: 60, b: 50},
+                paper_bgcolor: '#fafafa',
+                height: 520,
+                margin: {l: 55, r: 25, t: 50, b: 45},
                 legend: {
                     orientation: 'v', 
                     yanchor: 'top', 
@@ -481,7 +497,7 @@
                     bgcolor: 'rgba(255, 255, 255, 0.95)',
                     bordercolor: '#e2e8f0',
                     borderwidth: 1,
-                    font: {size: 11, family: 'Inter, sans-serif', color: '#475569'}
+                    font: {size: 10, family: 'Space Grotesk, sans-serif', color: '#475569'}
                 }
             };
             
