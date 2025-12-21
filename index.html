@@ -281,17 +281,17 @@
         </div>
     </details>
     
-    <h2>Historical YoY Growth</h2>
+    <h2>Regime Forecast Analysis</h2>
     
     <details>
-        <summary>How to read this chart</summary>
+        <summary>How to read the forecast chart</summary>
         <div style="padding: 8px 0;">
-            <p>Blue area = YoY growth. Red dot = current position. Above 0% = expansion. Below 0% = contraction. Drag the slider below the chart to zoom into specific time periods.</p>
+            <p>This chart shows historical YoY growth with regime zones and predicted next states. Hover over any point to see the top 5 predicted outcomes and their probabilities. Background colors indicate regime zones: Green (Expansion), Light Blue (Growth), Orange (Cooling), Red (Decline).</p>
         </div>
     </details>
     
     <div class="chart-section">
-        <div id="main-chart" style="height: 450px; position: relative;"></div>
+        <div id="forecast-chart" style="height: 700px;"></div>
     </div>
     
     <div class="threshold-info">
@@ -307,19 +307,6 @@
                 <p><strong>Bubble conditions.</strong> Investors borrowing at unsustainable rates. Sharp reversals follow. Examples: March 2000 (dot-com), July 2007 (crisis), Feb 2021 (meme stocks).</p>
             </div>
         </div>
-    </div>
-    
-    <h2>Regime Forecast Analysis</h2>
-    
-    <details>
-        <summary>How to read the forecast chart</summary>
-        <div style="padding: 8px 0;">
-            <p>This chart shows historical YoY growth with regime zones and predicted next states. Hover over any point to see the top 5 predicted outcomes and their probabilities. Background colors indicate regime zones: Green (Expansion), Light Blue (Growth), Orange (Cooling), Red (Decline).</p>
-        </div>
-    </details>
-    
-    <div class="chart-section">
-        <div id="forecast-chart" style="height: 700px;"></div>
     </div>
     
     <div class="reference">
@@ -370,73 +357,14 @@
                 // Create a map for quick forecast lookup
                 const forecastMap = new Map(forecastData.map(f => [f.date, f]));
                 
-                // Render simple chart
-                renderSimpleChart(marginData);
-                
                 // Render forecast chart
                 renderForecastChart(marginData, forecastMap);
                 
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('main-chart').innerHTML = 
+                document.getElementById('forecast-chart').innerHTML = 
                     '<p style="color: #999; text-align: center; padding: 50px;">Chart unavailable.</p>';
             }
-        }
-        
-        function renderSimpleChart(data) {
-            const dates = data.map(d => d.date);
-            const yoy = data.map(d => d.yoy_ma);
-            
-            const trace1 = {
-                x: dates,
-                y: yoy,
-                type: 'scatter',
-                fill: 'tozeroy',
-                fillcolor: 'rgba(100, 149, 237, 0.3)',
-                line: {color: '#4169E1', width: 3},
-                name: 'YoY Growth',
-                hovertemplate: '<b>%{x}</b><br>Growth: %{y:.1f}%<extra></extra>'
-            };
-            
-            const trace2 = {
-                x: [dates[dates.length-1]],
-                y: [yoy[yoy.length-1]],
-                mode: 'markers',
-                marker: {size: 12, color: '#DC143C', line: {width: 2, color: '#8B0000'}},
-                name: 'Current',
-                hovertemplate: '<b>Current Position</b><br>%{y:.1f}%<extra></extra>'
-            };
-            
-            const layout = {
-                shapes: [
-                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
-                     y0: 30, y1: 30, line: {dash: 'dot', color: '#FF8C00', width: 2}},
-                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
-                     y0: 60, y1: 60, line: {dash: 'dot', color: '#DC143C', width: 2}},
-                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
-                     y0: 0, y1: 0, line: {color: '#696969', width: 1}}
-                ],
-                annotations: [
-                    {x: dates[Math.floor(dates.length * 0.9)], y: 31.5, text: '30%', showarrow: false, 
-                     font: {color: '#FF8C00', size: 10}},
-                    {x: dates[Math.floor(dates.length * 0.9)], y: 61.5, text: '60%', showarrow: false, 
-                     font: {color: '#DC143C', size: 10}}
-                ],
-                showlegend: false,
-                margin: {t: 5, b: 60, l: 50, r: 10},
-                xaxis: {
-                    title: '',
-                    showgrid: false,
-                    rangeslider: {visible: true, thickness: 0.05, bgcolor: '#f8f9fa', bordercolor: '#ddd', borderwidth: 1},
-                    type: 'date'
-                },
-                yaxis: {title: 'YoY Growth (%)', showgrid: true, gridcolor: '#E8E8E8'},
-                plot_bgcolor: '#FAFAFA',
-                paper_bgcolor: '#fff',
-                hovermode: 'closest'
-            };
-            
-            Plotly.newPlot('main-chart', [trace1, trace2], layout, {responsive: true, displayModeBar: false});
         }
         
         function renderForecastChart(marginData, forecastMap) {
@@ -479,55 +407,98 @@
                 y: yoy,
                 type: 'scatter',
                 mode: 'lines',
-                line: {color: 'steelblue', width: 2},
+                line: {color: '#2563eb', width: 3.5, shape: 'spline'},
                 name: 'YoY% (smoothed)',
                 hovertext: hoverText,
-                hoverinfo: 'text'
+                hoverinfo: 'text',
+                fill: 'tozeroy',
+                fillcolor: 'rgba(37, 99, 235, 0.08)'
             };
             
             const layout = {
                 shapes: [
                     {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: 30, y1: 100, 
-                     fillcolor: 'green', opacity: 0.1, line: {width: 0}, layer: 'below'},
+                     fillcolor: '#10b981', opacity: 0.08, line: {width: 0}, layer: 'below'},
                     {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: 0, y1: 30, 
-                     fillcolor: 'lightblue', opacity: 0.1, line: {width: 0}, layer: 'below'},
+                     fillcolor: '#3b82f6', opacity: 0.06, line: {width: 0}, layer: 'below'},
                     {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: -30, y1: 0, 
-                     fillcolor: 'orange', opacity: 0.1, line: {width: 0}, layer: 'below'},
+                     fillcolor: '#f59e0b', opacity: 0.08, line: {width: 0}, layer: 'below'},
                     {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: -100, y1: -30, 
-                     fillcolor: 'red', opacity: 0.1, line: {width: 0}, layer: 'below'},
+                     fillcolor: '#ef4444', opacity: 0.08, line: {width: 0}, layer: 'below'},
                     {type: 'line', x0: dates[0], x1: dates[dates.length-1], y0: 30, y1: 30, 
-                     line: {dash: 'dash', color: 'green', width: 1, opacity: 0.5}},
+                     line: {dash: 'dash', color: '#10b981', width: 2, opacity: 0.7}},
                     {type: 'line', x0: dates[0], x1: dates[dates.length-1], y0: 0, y1: 0, 
-                     line: {dash: 'solid', color: 'black', width: 1, opacity: 0.3}},
+                     line: {dash: 'solid', color: '#64748b', width: 1.5, opacity: 0.5}},
                     {type: 'line', x0: dates[0], x1: dates[dates.length-1], y0: -30, y1: -30, 
-                     line: {dash: 'dash', color: 'red', width: 1, opacity: 0.5}}
+                     line: {dash: 'dash', color: '#ef4444', width: 2, opacity: 0.7}}
                 ],
                 annotations: [
-                    {x: dates[dates.length - 10], y: 31, text: 'Expansion threshold (+30%)', 
-                     showarrow: false, xanchor: 'right', font: {size: 10, color: 'green'}},
-                    {x: dates[dates.length - 10], y: -31, text: 'Decline threshold (-30%)', 
-                     showarrow: false, xanchor: 'right', font: {size: 10, color: 'red'}}
+                    {x: dates[dates.length - 10], y: 32, text: 'Expansion (+30%)', 
+                     showarrow: false, xanchor: 'right', font: {size: 11, color: '#059669', family: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif', weight: 500}},
+                    {x: dates[dates.length - 10], y: -32, text: 'Decline (-30%)', 
+                     showarrow: false, xanchor: 'right', font: {size: 11, color: '#dc2626', family: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif', weight: 500}}
                 ],
-                title: {text: 'Margin Debt Regime Analysis - YoY% Growth & Predicted Next Regime', font: {size: 14}},
-                xaxis: {title: 'Date'},
-                yaxis: {title: 'YoY% Change in Margin Debt (smoothed)'},
+                title: {
+                    text: 'Margin Debt Regime Analysis - YoY% Growth & Predicted Next Regime', 
+                    font: {size: 16, family: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif', weight: 600, color: '#0f172a'}
+                },
+                xaxis: {
+                    title: {text: 'Date', font: {size: 13, family: 'Inter, sans-serif', color: '#475569'}},
+                    showgrid: false,
+                    showline: true,
+                    linecolor: '#e2e8f0',
+                    linewidth: 2,
+                    tickfont: {size: 11, family: 'Inter, sans-serif', color: '#64748b'}
+                },
+                yaxis: {
+                    title: {text: 'YoY% Change', font: {size: 13, family: 'Inter, sans-serif', color: '#475569'}},
+                    showgrid: true,
+                    gridcolor: '#f1f5f9',
+                    gridwidth: 1,
+                    showline: true,
+                    linecolor: '#e2e8f0',
+                    linewidth: 2,
+                    tickfont: {size: 11, family: 'Inter, sans-serif', color: '#64748b'},
+                    zeroline: false
+                },
                 hovermode: 'x unified',
+                hoverlabel: {
+                    bgcolor: '#ffffff',
+                    bordercolor: '#e2e8f0',
+                    font: {size: 12, family: 'Inter, sans-serif', color: '#1e293b'}
+                },
                 showlegend: true,
-                template: 'plotly_white',
+                plot_bgcolor: '#ffffff',
+                paper_bgcolor: '#ffffff',
                 height: 700,
-                legend: {orientation: 'v', yanchor: 'top', y: 0.99, xanchor: 'left', x: 0.01}
+                margin: {l: 60, r: 30, t: 60, b: 50},
+                legend: {
+                    orientation: 'v', 
+                    yanchor: 'top', 
+                    y: 0.98, 
+                    xanchor: 'left', 
+                    x: 0.02,
+                    bgcolor: 'rgba(255, 255, 255, 0.95)',
+                    bordercolor: '#e2e8f0',
+                    borderwidth: 1,
+                    font: {size: 11, family: 'Inter, sans-serif', color: '#475569'}
+                }
             };
             
-            // Add legend items for regimes
+            // Add legend items for regimes with modern colors
             const legendTraces = [
                 trace,
-                {x: [null], y: [null], mode: 'markers', marker: {size: 10, color: 'green', opacity: 0.3}, 
+                {x: [null], y: [null], mode: 'markers', 
+                 marker: {size: 12, color: '#10b981', opacity: 0.7, symbol: 'square'}, 
                  name: 'Expansion (E)', showlegend: true},
-                {x: [null], y: [null], mode: 'markers', marker: {size: 10, color: 'lightblue', opacity: 0.3}, 
+                {x: [null], y: [null], mode: 'markers', 
+                 marker: {size: 12, color: '#3b82f6', opacity: 0.7, symbol: 'square'}, 
                  name: 'Growth (G)', showlegend: true},
-                {x: [null], y: [null], mode: 'markers', marker: {size: 10, color: 'orange', opacity: 0.3}, 
+                {x: [null], y: [null], mode: 'markers', 
+                 marker: {size: 12, color: '#f59e0b', opacity: 0.7, symbol: 'square'}, 
                  name: 'Cooling (C)', showlegend: true},
-                {x: [null], y: [null], mode: 'markers', marker: {size: 10, color: 'red', opacity: 0.3}, 
+                {x: [null], y: [null], mode: 'markers', 
+                 marker: {size: 12, color: '#ef4444', opacity: 0.7, symbol: 'square'}, 
                  name: 'Decline (D)', showlegend: true}
             ];
             
