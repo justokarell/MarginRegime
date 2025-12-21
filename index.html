@@ -182,58 +182,6 @@
             line-height: 1.4;
         }
         
-        .threshold-info {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 10px 12px;
-            margin-top: 10px;
-            font-size: 11px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .threshold-info h4 {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            letter-spacing: -0.01em;
-        }
-        
-        .threshold-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 8px;
-        }
-        
-        .threshold-item {
-            padding: 8px;
-            border-radius: 4px;
-        }
-        
-        .threshold-item.late-cycle {
-            background: #fff3cd;
-            border-left: 3px solid #FF8C00;
-        }
-        
-        .threshold-item.extreme {
-            background: #f8d7da;
-            border-left: 3px solid #DC143C;
-        }
-        
-        .threshold-item h5 {
-            font-size: 11px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            letter-spacing: -0.01em;
-        }
-        
-        .threshold-item p {
-            font-size: 10px;
-            line-height: 1.35;
-            margin-bottom: 3px;
-        }
-        
         .reference {
             background: #fff;
             padding: 10px 12px;
@@ -281,9 +229,6 @@
             }
             .signal {
                 flex: 1 1 45%;
-            }
-            .threshold-grid {
-                grid-template-columns: 1fr;
             }
         }
         
@@ -367,21 +312,6 @@
     
     <div class="chart-section">
         <div id="forecast-chart" style="height: 520px;"></div>
-    </div>
-    
-    <div class="threshold-info">
-        <h4>What the Thresholds Mean</h4>
-        <div class="threshold-grid">
-            <div class="threshold-item late-cycle">
-                <h5>Late-Cycle (30-60%)</h5>
-                <p><strong>Investors are highly leveraged.</strong> Growth is elevated but unsustainable. Historically precedes market peaks. Expect either gradual cooling to 10-15% or spike to 60%+ before crash.</p>
-            </div>
-            
-            <div class="threshold-item extreme">
-                <h5>Extreme (60%+)</h5>
-                <p><strong>Bubble conditions.</strong> Investors borrowing at unsustainable rates. Sharp reversals follow. Examples: March 2000 (dot-com), July 2007 (crisis), Feb 2021 (meme stocks).</p>
-            </div>
-        </div>
     </div>
     
     <div class="reference">
