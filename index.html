@@ -118,43 +118,12 @@
             margin-bottom: 15px;
         }
         
-        .scenario-popup {
-            position: fixed;
-            background: white;
-            border: 2px solid #1a1a1a;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
-            min-width: 250px;
-            display: none;
-            pointer-events: none;
-        }
-        
-        .scenario-popup.show {
-            display: block;
-        }
-        
-        .scenario-popup h3 {
-            font-size: 14px;
+        h2 {
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: #1a1a1a;
-        }
-        
-        .scenario-popup p {
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-        
-        .scenario-popup ul {
-            margin: 0 0 0 18px;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-        
-        .scenario-popup li {
-            margin-bottom: 4px;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e0e0e0;
         }
         
         .threshold-info {
@@ -170,11 +139,6 @@
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 8px;
-        }
-        
-        .threshold-info p {
-            margin-bottom: 6px;
-            line-height: 1.5;
         }
         
         .threshold-grid {
@@ -317,39 +281,19 @@
         </div>
     </details>
     
+    <h2>Historical YoY Growth</h2>
+    
     <details>
         <summary>How to read this chart</summary>
         <div style="padding: 8px 0;">
-            <p>Blue area = YoY growth. Red dot = current position. Above 0% = expansion. Below 0% = contraction. Drag the slider below the chart to zoom into specific time periods. Click the chart area between 10-20% or 50-70% to see what historically happens at those levels.</p>
+            <p>Blue area = YoY growth. Red dot = current position. Above 0% = expansion. Below 0% = contraction. Drag the slider below the chart to zoom into specific time periods.</p>
         </div>
     </details>
     
     <div class="chart-section">
         <div id="main-chart" style="height: 450px; position: relative;"></div>
-        
-        <!-- Scenario popups (only show when clicking specific regions) -->
-        <div id="baseline-popup" class="scenario-popup">
-            <h3>Baseline Scenario (70%)</h3>
-            <p>When growth is 10-20%: Gradual normalization</p>
-            <ul>
-                <li>Growth cools to 10-15%</li>
-                <li>No crash, just mean reversion</li>
-                <li>Historical avg: 11.7% after 6 months</li>
-            </ul>
-        </div>
-        
-        <div id="risk-popup" class="scenario-popup">
-            <h3>Risk Scenario (30%)</h3>
-            <p>When growth spikes to 50-70%: Euphoria then reversal</p>
-            <ul>
-                <li>Growth accelerates to 50-60%</li>
-                <li>Then sharp decline follows</li>
-                <li>Seen in: 2000, 2007, 2021</li>
-            </ul>
-        </div>
     </div>
     
-    <!-- Threshold explanations below chart -->
     <div class="threshold-info">
         <h4>What the Thresholds Mean</h4>
         <div class="threshold-grid">
@@ -363,6 +307,19 @@
                 <p><strong>Bubble conditions.</strong> Investors borrowing at unsustainable rates. Sharp reversals follow. Examples: March 2000 (dot-com), July 2007 (crisis), Feb 2021 (meme stocks).</p>
             </div>
         </div>
+    </div>
+    
+    <h2>Regime Forecast Analysis</h2>
+    
+    <details>
+        <summary>How to read the forecast chart</summary>
+        <div style="padding: 8px 0;">
+            <p>This chart shows historical YoY growth with regime zones and predicted next states. Hover over any point to see the top 5 predicted outcomes and their probabilities. Background colors indicate regime zones: Green (Expansion), Light Blue (Growth), Orange (Cooling), Red (Decline).</p>
+        </div>
+    </details>
+    
+    <div class="chart-section">
+        <div id="forecast-chart" style="height: 700px;"></div>
     </div>
     
     <div class="reference">
@@ -399,32 +356,25 @@
     </footer>
     
     <script>
-        let baselinePopup, riskPopup, allData = [];
-        
         async function loadData() {
             try {
-                const response = await fetch('regime_history.csv');
-                const csvText = await response.text();
+                // Load both datasets
+                const [marginResponse, forecastResponse] = await Promise.all([
+                    fetch('margin_debt_data.json'),
+                    fetch('forecast_data.json')
+                ]);
                 
-                const lines = csvText.split('\n');
-                allData = [];
+                const marginData = await marginResponse.json();
+                const forecastData = await forecastResponse.json();
                 
-                for (let i = 1; i < lines.length; i++) {
-                    if (lines[i].trim()) {
-                        const values = lines[i].split(',');
-                        allData.push({
-                            date: values[0],
-                            yoy: parseFloat(values[1])
-                        });
-                    }
-                }
+                // Create a map for quick forecast lookup
+                const forecastMap = new Map(forecastData.map(f => [f.date, f]));
                 
-                // Get popup elements
-                baselinePopup = document.getElementById('baseline-popup');
-                riskPopup = document.getElementById('risk-popup');
+                // Render simple chart
+                renderSimpleChart(marginData);
                 
-                // Initial render with all data
-                updateChart();
+                // Render forecast chart
+                renderForecastChart(marginData, forecastMap);
                 
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -433,11 +383,10 @@
             }
         }
         
-        function updateChart() {
-            const dates = allData.map(d => d.date);
-            const yoy = allData.map(d => d.yoy);
+        function renderSimpleChart(data) {
+            const dates = data.map(d => d.date);
+            const yoy = data.map(d => d.yoy_ma);
             
-            // Main trace with improved colors
             const trace1 = {
                 x: dates,
                 y: yoy,
@@ -449,7 +398,6 @@
                 hovertemplate: '<b>%{x}</b><br>Growth: %{y:.1f}%<extra></extra>'
             };
             
-            // Current position marker
             const trace2 = {
                 x: [dates[dates.length-1]],
                 y: [yoy[yoy.length-1]],
@@ -461,89 +409,129 @@
             
             const layout = {
                 shapes: [
-                    // 30% threshold
                     {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
                      y0: 30, y1: 30, line: {dash: 'dot', color: '#FF8C00', width: 2}},
-                    // 60% threshold
                     {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
                      y0: 60, y1: 60, line: {dash: 'dot', color: '#DC143C', width: 2}},
-                    // Zero line
                     {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
                      y0: 0, y1: 0, line: {color: '#696969', width: 1}}
                 ],
                 annotations: [
                     {x: dates[Math.floor(dates.length * 0.9)], y: 31.5, text: '30%', showarrow: false, 
-                     font: {color: '#FF8C00', size: 10, family: 'Arial, sans-serif'}},
+                     font: {color: '#FF8C00', size: 10}},
                     {x: dates[Math.floor(dates.length * 0.9)], y: 61.5, text: '60%', showarrow: false, 
-                     font: {color: '#DC143C', size: 10, family: 'Arial, sans-serif'}}
+                     font: {color: '#DC143C', size: 10}}
                 ],
                 showlegend: false,
                 margin: {t: 5, b: 60, l: 50, r: 10},
                 xaxis: {
                     title: '',
                     showgrid: false,
-                    color: '#333',
-                    rangeslider: {
-                        visible: true,
-                        thickness: 0.05,
-                        bgcolor: '#f8f9fa',
-                        bordercolor: '#ddd',
-                        borderwidth: 1
-                    },
+                    rangeslider: {visible: true, thickness: 0.05, bgcolor: '#f8f9fa', bordercolor: '#ddd', borderwidth: 1},
                     type: 'date'
                 },
-                yaxis: {
-                    title: 'YoY Growth (%)',
-                    showgrid: true,
-                    gridcolor: '#E8E8E8',
-                    color: '#333',
-                    fixedrange: false
-                },
+                yaxis: {title: 'YoY Growth (%)', showgrid: true, gridcolor: '#E8E8E8'},
                 plot_bgcolor: '#FAFAFA',
                 paper_bgcolor: '#fff',
-                font: {family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', size: 11},
                 hovermode: 'closest'
             };
             
-            const config = {
-                responsive: true,
-                displayModeBar: false
+            Plotly.newPlot('main-chart', [trace1, trace2], layout, {responsive: true, displayModeBar: false});
+        }
+        
+        function renderForecastChart(marginData, forecastMap) {
+            // Build hover text with predictions
+            const hoverText = marginData.map(d => {
+                const forecast = forecastMap.get(d.date);
+                
+                if (forecast) {
+                    let text = `<b>Date: ${d.date}</b><br>`;
+                    text += `Current State: ${d.state}<br>`;
+                    text += `YoY: ${d.yoy_ma.toFixed(1)}%<br>`;
+                    text += `<br><b>Predicted Next State:</b> ${forecast.pred_state} (${(forecast.confidence * 100).toFixed(1)}%)<br>`;
+                    text += `<br><b>Top Predictions:</b><br>`;
+                    
+                    for (let i = 1; i <= 5; i++) {
+                        const state = forecast[`top${i}_state`];
+                        const prob = forecast[`top${i}_prob`];
+                        if (state && prob > 0) {
+                            text += `  ${i}. ${state}: ${(prob * 100).toFixed(1)}%<br>`;
+                        }
+                    }
+                    
+                    text += `<br><b>Regime Probabilities:</b><br>`;
+                    if (forecast.prob_E > 0) text += `  Expansion: ${(forecast.prob_E * 100).toFixed(1)}%<br>`;
+                    if (forecast.prob_G > 0) text += `  Growth: ${(forecast.prob_G * 100).toFixed(1)}%<br>`;
+                    if (forecast.prob_C > 0) text += `  Cooling: ${(forecast.prob_C * 100).toFixed(1)}%<br>`;
+                    if (forecast.prob_D > 0) text += `  Decline: ${(forecast.prob_D * 100).toFixed(1)}%<br>`;
+                    
+                    return text;
+                } else {
+                    return `<b>Date: ${d.date}</b><br>Current State: ${d.state}<br>YoY: ${d.yoy_ma.toFixed(1)}%<br><br><i>No forecast available</i>`;
+                }
+            });
+            
+            const dates = marginData.map(d => d.date);
+            const yoy = marginData.map(d => d.yoy_ma);
+            
+            const trace = {
+                x: dates,
+                y: yoy,
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: 'steelblue', width: 2},
+                name: 'YoY% (smoothed)',
+                hovertext: hoverText,
+                hoverinfo: 'text'
             };
             
-            Plotly.newPlot('main-chart', [trace1, trace2], layout, config);
+            const layout = {
+                shapes: [
+                    {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: 30, y1: 100, 
+                     fillcolor: 'green', opacity: 0.1, line: {width: 0}, layer: 'below'},
+                    {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: 0, y1: 30, 
+                     fillcolor: 'lightblue', opacity: 0.1, line: {width: 0}, layer: 'below'},
+                    {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: -30, y1: 0, 
+                     fillcolor: 'orange', opacity: 0.1, line: {width: 0}, layer: 'below'},
+                    {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: -100, y1: -30, 
+                     fillcolor: 'red', opacity: 0.1, line: {width: 0}, layer: 'below'},
+                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], y0: 30, y1: 30, 
+                     line: {dash: 'dash', color: 'green', width: 1, opacity: 0.5}},
+                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], y0: 0, y1: 0, 
+                     line: {dash: 'solid', color: 'black', width: 1, opacity: 0.3}},
+                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], y0: -30, y1: -30, 
+                     line: {dash: 'dash', color: 'red', width: 1, opacity: 0.5}}
+                ],
+                annotations: [
+                    {x: dates[dates.length - 10], y: 31, text: 'Expansion threshold (+30%)', 
+                     showarrow: false, xanchor: 'right', font: {size: 10, color: 'green'}},
+                    {x: dates[dates.length - 10], y: -31, text: 'Decline threshold (-30%)', 
+                     showarrow: false, xanchor: 'right', font: {size: 10, color: 'red'}}
+                ],
+                title: {text: 'Margin Debt Regime Analysis - YoY% Growth & Predicted Next Regime', font: {size: 14}},
+                xaxis: {title: 'Date'},
+                yaxis: {title: 'YoY% Change in Margin Debt (smoothed)'},
+                hovermode: 'x unified',
+                showlegend: true,
+                template: 'plotly_white',
+                height: 700,
+                legend: {orientation: 'v', yanchor: 'top', y: 0.99, xanchor: 'left', x: 0.01}
+            };
             
-            // Add click event to show scenario popups
-            const chartDiv = document.getElementById('main-chart');
-            chartDiv.on('plotly_click', function(data) {
-                const point = data.points[0];
-                const yValue = point.y;
-                
-                // Show popup based on clicked Y value
-                if (yValue >= 10 && yValue <= 20) {
-                    showPopup(baselinePopup, data.event);
-                } else if (yValue >= 50 && yValue <= 70) {
-                    showPopup(riskPopup, data.event);
-                }
-            });
+            // Add legend items for regimes
+            const legendTraces = [
+                trace,
+                {x: [null], y: [null], mode: 'markers', marker: {size: 10, color: 'green', opacity: 0.3}, 
+                 name: 'Expansion (E)', showlegend: true},
+                {x: [null], y: [null], mode: 'markers', marker: {size: 10, color: 'lightblue', opacity: 0.3}, 
+                 name: 'Growth (G)', showlegend: true},
+                {x: [null], y: [null], mode: 'markers', marker: {size: 10, color: 'orange', opacity: 0.3}, 
+                 name: 'Cooling (C)', showlegend: true},
+                {x: [null], y: [null], mode: 'markers', marker: {size: 10, color: 'red', opacity: 0.3}, 
+                 name: 'Decline (D)', showlegend: true}
+            ];
             
-            // Click anywhere else to hide popups
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('#main-chart') && !e.target.closest('.scenario-popup')) {
-                    hidePopups();
-                }
-            });
-        }
-        
-        function showPopup(popup, event) {
-            hidePopups();
-            popup.style.left = (event.clientX + 15) + 'px';
-            popup.style.top = (event.clientY + 15) + 'px';
-            popup.classList.add('show');
-        }
-        
-        function hidePopups() {
-            if (baselinePopup) baselinePopup.classList.remove('show');
-            if (riskPopup) riskPopup.classList.remove('show');
+            Plotly.newPlot('forecast-chart', legendTraces, layout, {responsive: true, displayModeBar: false});
         }
         
         window.addEventListener('load', loadData);
