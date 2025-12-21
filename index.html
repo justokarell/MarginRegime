@@ -99,14 +99,6 @@
         
         .warning { border-left-color: #ffc107; }
         
-        h2 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 5px;
-        }
-        
         details {
             margin-bottom: 10px;
             font-size: 12px;
@@ -123,42 +115,45 @@
         summary:hover { color: #1a1a1a; }
         
         .chart-section {
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 15px;
             margin-bottom: 15px;
         }
         
-        .scenarios {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .scenario-popup {
+            position: absolute;
+            background: white;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 250px;
+            display: none;
         }
         
-        .scenario {
-            background: #fafafa;
-            padding: 12px;
-            flex: 1;
+        .scenario-popup.show {
+            display: block;
         }
         
-        .scenario h3 {
-            font-size: 13px;
+        .scenario-popup h3 {
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
         }
         
-        .scenario p {
-            font-size: 12px;
-            margin-bottom: 5px;
+        .scenario-popup p {
+            font-size: 13px;
+            margin-bottom: 8px;
         }
         
-        .scenario ul {
-            margin: 0 0 0 15px;
-            font-size: 12px;
+        .scenario-popup ul {
+            margin: 0 0 0 18px;
+            font-size: 13px;
+            line-height: 1.6;
         }
         
-        .scenario li {
-            margin-bottom: 2px;
+        .scenario-popup li {
+            margin-bottom: 4px;
         }
         
         .reference {
@@ -217,12 +212,6 @@
                 grid-template-columns: 1fr;
                 gap: 10px;
             }
-            .chart-section {
-                grid-template-columns: 1fr;
-            }
-            .scenarios {
-                flex-direction: row;
-            }
             .reference-grid {
                 grid-template-columns: 1fr;
             }
@@ -270,38 +259,35 @@
         </div>
     </details>
     
-    <h2>Historical Context</h2>
-    
     <details>
         <summary>How to read this chart</summary>
         <div style="padding: 8px 0;">
-            <p>Blue line = YoY growth. Red dot = current. Above 0% = expansion. Below 0% = contraction. Above 30% = late-cycle. Above 60% = extreme.</p>
+            <p>Gray area = YoY growth. Red dot = current. Above 0% = expansion. Below 0% = contraction. Above 30% = late-cycle. Above 60% = extreme. Hover over chart to see scenarios.</p>
         </div>
     </details>
     
     <div class="chart-section">
-        <div id="main-chart" style="height: 350px;"></div>
+        <div id="main-chart" style="height: 400px; position: relative;"></div>
         
-        <div class="scenarios">
-            <div class="scenario">
-                <h3>Baseline (70%)</h3>
-                <p style="margin-bottom: 4px;">Gradual normalization</p>
-                <ul>
-                    <li>Cools to 10-15%</li>
-                    <li>No crash, reversion</li>
-                    <li>Avg: 11.7% (6M)</li>
-                </ul>
-            </div>
-            
-            <div class="scenario">
-                <h3>Risk (30%)</h3>
-                <p style="margin-bottom: 4px;">Spike then reversal</p>
-                <ul>
-                    <li>Spike to 50-60%</li>
-                    <li>Sharp decline</li>
-                    <li>2000, 2007, 2021</li>
-                </ul>
-            </div>
+        <!-- Scenario popups -->
+        <div id="baseline-popup" class="scenario-popup">
+            <h3>Baseline (70%)</h3>
+            <p>Gradual normalization</p>
+            <ul>
+                <li>Cools to 10-15%</li>
+                <li>No crash, reversion</li>
+                <li>Avg: 11.7% (6M)</li>
+            </ul>
+        </div>
+        
+        <div id="risk-popup" class="scenario-popup">
+            <h3>Risk (30%)</h3>
+            <p>Spike then reversal</p>
+            <ul>
+                <li>Spike to 50-60%</li>
+                <li>Sharp decline</li>
+                <li>2000, 2007, 2021</li>
+            </ul>
         </div>
     </div>
     
@@ -339,6 +325,8 @@
     </footer>
     
     <script>
+        let baselinePopup, riskPopup;
+        
         async function loadData() {
             try {
                 const response = await fetch('regime_history.csv');
@@ -361,55 +349,111 @@
                 const dates = recent.map(d => d.date);
                 const yoy = recent.map(d => d.yoy);
                 
+                // Main trace with improved colors
                 const trace1 = {
                     x: dates,
                     y: yoy,
                     type: 'scatter',
                     fill: 'tozeroy',
-                    fillcolor: 'rgba(100, 100, 100, 0.1)',
-                    line: {color: '#1a1a1a', width: 2},
-                    name: 'Growth Rate'
+                    fillcolor: 'rgba(100, 149, 237, 0.3)',
+                    line: {color: '#4169E1', width: 3},
+                    name: 'YoY Growth',
+                    hovertemplate: '<b>%{x}</b><br>Growth: %{y:.1f}%<extra></extra>'
                 };
                 
+                // Current position marker
                 const trace2 = {
                     x: [dates[dates.length-1]],
                     y: [yoy[yoy.length-1]],
                     mode: 'markers',
-                    marker: {size: 8, color: '#dc3545', line: {width: 2, color: '#1a1a1a'}},
-                    name: 'Current'
+                    marker: {size: 12, color: '#DC143C', line: {width: 2, color: '#8B0000'}},
+                    name: 'Current',
+                    hovertemplate: '<b>Current Position</b><br>%{y:.1f}%<extra></extra>'
                 };
                 
                 const layout = {
                     shapes: [
+                        // 30% threshold
                         {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
-                         y0: 30, y1: 30, line: {dash: 'dot', color: '#999', width: 1}},
+                         y0: 30, y1: 30, line: {dash: 'dot', color: '#FF8C00', width: 2}},
+                        // 60% threshold
                         {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
-                         y0: 60, y1: 60, line: {dash: 'dot', color: '#999', width: 1}},
+                         y0: 60, y1: 60, line: {dash: 'dot', color: '#DC143C', width: 2}},
+                        // Zero line
                         {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
-                         y0: 0, y1: 0, line: {color: '#ccc', width: 1}}
+                         y0: 0, y1: 0, line: {color: '#696969', width: 1}}
                     ],
                     annotations: [
-                        {x: dates[50], y: 31, text: '30%', showarrow: false, 
-                         font: {color: '#999', size: 9}},
-                        {x: dates[50], y: 61, text: '60%', showarrow: false, 
-                         font: {color: '#999', size: 9}}
+                        {x: dates[50], y: 31.5, text: '30% Late-Cycle', showarrow: false, 
+                         font: {color: '#FF8C00', size: 10, family: 'Arial, sans-serif'}},
+                        {x: dates[50], y: 61.5, text: '60% Extreme', showarrow: false, 
+                         font: {color: '#DC143C', size: 10, family: 'Arial, sans-serif'}}
                     ],
                     showlegend: false,
-                    margin: {t: 5, b: 35, l: 45, r: 10},
-                    xaxis: {title: '', showgrid: false},
-                    yaxis: {title: 'YoY Growth (%)', showgrid: true, gridcolor: '#f0f0f0'},
-                    plot_bgcolor: '#fff',
+                    margin: {t: 5, b: 40, l: 50, r: 10},
+                    xaxis: {
+                        title: '',
+                        showgrid: false,
+                        color: '#333'
+                    },
+                    yaxis: {
+                        title: 'YoY Growth (%)',
+                        showgrid: true,
+                        gridcolor: '#E8E8E8',
+                        color: '#333'
+                    },
+                    plot_bgcolor: '#FAFAFA',
                     paper_bgcolor: '#fff',
-                    font: {family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', size: 10}
+                    font: {family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', size: 11},
+                    hovermode: 'closest'
                 };
                 
-                Plotly.newPlot('main-chart', [trace1, trace2], layout, {responsive: true, displayModeBar: false});
+                const config = {
+                    responsive: true,
+                    displayModeBar: false
+                };
+                
+                Plotly.newPlot('main-chart', [trace1, trace2], layout, config);
+                
+                // Get popup elements
+                baselinePopup = document.getElementById('baseline-popup');
+                riskPopup = document.getElementById('risk-popup');
+                
+                // Add hover event to show popups
+                const chartDiv = document.getElementById('main-chart');
+                chartDiv.on('plotly_hover', function(data) {
+                    const point = data.points[0];
+                    const yValue = point.y;
+                    
+                    // Show appropriate popup based on Y value
+                    if (yValue >= 10 && yValue <= 20) {
+                        showPopup(baselinePopup, data.event);
+                    } else if (yValue >= 50 && yValue <= 70) {
+                        showPopup(riskPopup, data.event);
+                    }
+                });
+                
+                chartDiv.on('plotly_unhover', function() {
+                    hidePopups();
+                });
                 
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('main-chart').innerHTML = 
                     '<p style="color: #999; text-align: center; padding: 50px;">Chart unavailable.</p>';
             }
+        }
+        
+        function showPopup(popup, event) {
+            hidePopups();
+            popup.style.left = (event.pageX + 15) + 'px';
+            popup.style.top = (event.pageY - 50) + 'px';
+            popup.classList.add('show');
+        }
+        
+        function hidePopups() {
+            if (baselinePopup) baselinePopup.classList.remove('show');
+            if (riskPopup) riskPopup.classList.remove('show');
         }
         
         window.addEventListener('load', loadData);
