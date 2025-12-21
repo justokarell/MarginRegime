@@ -42,7 +42,7 @@
             border-left: 3px solid #ffc107;
             padding: 12px 15px;
             display: grid;
-            grid-template-columns: 120px 1fr;
+            grid-template-columns: 120px 1fr 180px;
             gap: 15px;
             align-items: center;
             flex: 2;
@@ -81,6 +81,46 @@
         
         .interpretation p {
             margin-bottom: 4px;
+        }
+        
+        .momentum-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+        
+        .momentum-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .momentum-label {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+        
+        .momentum-value {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        .momentum-value.accel {
+            color: #10b981;
+        }
+        
+        .momentum-value.decel {
+            color: #ef4444;
+        }
+        
+        .momentum-value.neutral {
+            color: #64748b;
         }
         
         .signal {
@@ -237,6 +277,7 @@
             }
             .status {
                 flex: 1 1 100%;
+                grid-template-columns: 120px 1fr 180px;
             }
             .signal {
                 flex: 1 1 45%;
@@ -255,6 +296,9 @@
                 grid-template-columns: 1fr;
                 gap: 10px;
             }
+            .momentum-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
             .reference-grid {
                 grid-template-columns: 1fr;
             }
@@ -271,14 +315,29 @@
         <div class="status">
             <div class="metric-display">
                 <div class="regime-label">Late-Cycle Expansion</div>
-                <div class="metric">+36.3%</div>
-                <div class="metric-sub">year-over-year</div>
+                <div class="metric" id="current-yoy">+36.3%</div>
+                <div class="metric-sub">YoY change in margin debt</div>
             </div>
             
             <div class="interpretation">
                 <p><strong>Position:</strong> Near the end of a growth phase.</p>
                 <p><strong>Risk:</strong> Elevated. Typically reverts to 10-15% within six months.</p>
                 <p><strong>Outlook:</strong> Decelerating. Top 10% historically.</p>
+            </div>
+            
+            <div class="momentum-grid">
+                <div class="momentum-item">
+                    <div class="momentum-label">1mo</div>
+                    <div class="momentum-value decel" id="change-1m">-8.9pp</div>
+                </div>
+                <div class="momentum-item">
+                    <div class="momentum-label">2mo</div>
+                    <div class="momentum-value decel" id="change-2m">-2.2pp</div>
+                </div>
+                <div class="momentum-item">
+                    <div class="momentum-label">3mo</div>
+                    <div class="momentum-value accel" id="change-3m">+3.4pp</div>
+                </div>
             </div>
         </div>
         
@@ -304,7 +363,7 @@
     
     <h2>Regime Forecast Analysis</h2>
     
-    <p class="chart-subtitle">Historical YoY growth with regime zones and predicted next states. Hover over any point to see top 5 predicted outcomes and probabilities. Background colors: Green (Expansion), Blue (Growth), Orange (Cooling), Red (Decline).</p>
+    <p class="chart-subtitle">Historical YoY growth with regime zones and predicted next states. Hover over any point to see top 5 predicted outcomes and probabilities. Background colors: Green (Expansion), Blue (Growth), Orange (Contraction), Red (Crisis).</p>
     
     <div class="chart-section">
         <div id="forecast-chart" style="height: 520px;"></div>
@@ -361,14 +420,19 @@
     <script>
         async function loadData() {
             try {
-                // Load both datasets
-                const [marginResponse, forecastResponse] = await Promise.all([
+                // Load all datasets
+                const [marginResponse, forecastResponse, metricsResponse] = await Promise.all([
                     fetch('margin_debt_data.json'),
-                    fetch('forecast_data.json')
+                    fetch('forecast_data.json'),
+                    fetch('current_metrics.json')
                 ]);
                 
                 const marginData = await marginResponse.json();
                 const forecastData = await forecastResponse.json();
+                const metrics = await metricsResponse.json();
+                
+                // Update current metrics display
+                updateMetricsDisplay(metrics);
                 
                 // Create a map for quick forecast lookup
                 const forecastMap = new Map(forecastData.map(f => [f.date, f]));
@@ -381,6 +445,26 @@
                 document.getElementById('forecast-chart').innerHTML = 
                     '<p style="color: #999; text-align: center; padding: 50px;">Chart unavailable.</p>';
             }
+        }
+        
+        function updateMetricsDisplay(metrics) {
+            // Update current YoY
+            document.getElementById('current-yoy').textContent = 
+                (metrics.current_yoy > 0 ? '+' : '') + metrics.current_yoy.toFixed(1) + '%';
+            
+            // Update momentum indicators
+            const change1m = document.getElementById('change-1m');
+            const change2m = document.getElementById('change-2m');
+            const change3m = document.getElementById('change-3m');
+            
+            change1m.textContent = (metrics.change_1m > 0 ? '+' : '') + metrics.change_1m.toFixed(1) + 'pp';
+            change1m.className = 'momentum-value ' + (metrics.change_1m > 0.1 ? 'accel' : metrics.change_1m < -0.1 ? 'decel' : 'neutral');
+            
+            change2m.textContent = (metrics.change_2m > 0 ? '+' : '') + metrics.change_2m.toFixed(1) + 'pp';
+            change2m.className = 'momentum-value ' + (metrics.change_2m > 0.1 ? 'accel' : metrics.change_2m < -0.1 ? 'decel' : 'neutral');
+            
+            change3m.textContent = (metrics.change_3m > 0 ? '+' : '') + metrics.change_3m.toFixed(1) + 'pp';
+            change3m.className = 'momentum-value ' + (metrics.change_3m > 0.1 ? 'accel' : metrics.change_3m < -0.1 ? 'decel' : 'neutral');
         }
         
         function renderForecastChart(marginData, forecastMap) {
@@ -406,8 +490,8 @@
                     text += `<br><b>Regime Probabilities:</b><br>`;
                     if (forecast.prob_E > 0) text += `  Expansion: ${(forecast.prob_E * 100).toFixed(1)}%<br>`;
                     if (forecast.prob_G > 0) text += `  Growth: ${(forecast.prob_G * 100).toFixed(1)}%<br>`;
-                    if (forecast.prob_C > 0) text += `  Cooling: ${(forecast.prob_C * 100).toFixed(1)}%<br>`;
-                    if (forecast.prob_D > 0) text += `  Decline: ${(forecast.prob_D * 100).toFixed(1)}%<br>`;
+                    if (forecast.prob_C > 0) text += `  Contraction: ${(forecast.prob_C * 100).toFixed(1)}%<br>`;
+                    if (forecast.prob_D > 0) text += `  Crisis: ${(forecast.prob_D * 100).toFixed(1)}%<br>`;
                     
                     return text;
                 } else {
@@ -451,7 +535,7 @@
                 annotations: [
                     {x: dates[dates.length - 10], y: 32, text: 'Expansion (+30%)', 
                      showarrow: false, xanchor: 'right', font: {size: 10, color: '#059669', family: 'Space Grotesk, sans-serif', weight: 500}},
-                    {x: dates[dates.length - 10], y: -32, text: 'Decline (-30%)', 
+                    {x: dates[dates.length - 10], y: -32, text: 'Crisis (-30%)', 
                      showarrow: false, xanchor: 'right', font: {size: 10, color: '#dc2626', family: 'Space Grotesk, sans-serif', weight: 500}}
                 ],
                 title: {
@@ -512,10 +596,10 @@
                  name: 'Growth (G)', showlegend: true},
                 {x: [null], y: [null], mode: 'markers', 
                  marker: {size: 12, color: '#f59e0b', opacity: 0.7, symbol: 'square'}, 
-                 name: 'Cooling (C)', showlegend: true},
+                 name: 'Contraction (C)', showlegend: true},
                 {x: [null], y: [null], mode: 'markers', 
                  marker: {size: 12, color: '#ef4444', opacity: 0.7, symbol: 'square'}, 
-                 name: 'Decline (D)', showlegend: true}
+                 name: 'Crisis (D)', showlegend: true}
             ];
             
             Plotly.newPlot('forecast-chart', legendTraces, layout, {responsive: true, displayModeBar: false});
