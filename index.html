@@ -114,6 +114,30 @@
         
         summary:hover { color: #1a1a1a; }
         
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .chart-controls label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .chart-controls input[type="range"] {
+            flex: 1;
+            max-width: 300px;
+        }
+        
+        .chart-controls .range-value {
+            font-size: 12px;
+            color: #1a1a1a;
+            min-width: 80px;
+        }
+        
         .chart-section {
             margin-bottom: 15px;
         }
@@ -154,6 +178,48 @@
         
         .scenario-popup li {
             margin-bottom: 4px;
+        }
+        
+        .threshold-popup {
+            position: absolute;
+            background: white;
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 12px 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 280px;
+            display: none;
+            font-size: 12px;
+        }
+        
+        .threshold-popup.show {
+            display: block;
+        }
+        
+        .threshold-popup.late-cycle {
+            border-color: #FF8C00;
+        }
+        
+        .threshold-popup.extreme {
+            border-color: #DC143C;
+        }
+        
+        .threshold-popup h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .threshold-popup p {
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        
+        .threshold-label {
+            cursor: help;
+            text-decoration: underline;
+            text-decoration-style: dotted;
         }
         
         .reference {
@@ -215,6 +281,13 @@
             .reference-grid {
                 grid-template-columns: 1fr;
             }
+            .chart-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .chart-controls input[type="range"] {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -262,9 +335,15 @@
     <details>
         <summary>How to read this chart</summary>
         <div style="padding: 8px 0;">
-            <p>Gray area = YoY growth. Red dot = current. Above 0% = expansion. Below 0% = contraction. Above 30% = late-cycle. Above 60% = extreme. Hover over chart to see scenarios.</p>
+            <p>Blue area = YoY growth. Red dot = current. Above 0% = expansion. Below 0% = contraction. Hover over dotted lines to see what "Late-Cycle" and "Extreme" mean. Hover over the chart area to see historical outcomes.</p>
         </div>
     </details>
+    
+    <div class="chart-controls">
+        <label for="timeRange">Time Range:</label>
+        <input type="range" id="timeRange" min="12" max="0" value="60" step="12">
+        <span class="range-value" id="rangeValue">5 years</span>
+    </div>
     
     <div class="chart-section">
         <div id="main-chart" style="height: 400px; position: relative;"></div>
@@ -288,6 +367,21 @@
                 <li>Sharp decline</li>
                 <li>2000, 2007, 2021</li>
             </ul>
+        </div>
+        
+        <!-- Threshold explanation popups -->
+        <div id="late-cycle-popup" class="threshold-popup late-cycle">
+            <h4>Late-Cycle (30-60%)</h4>
+            <p><strong>What it means:</strong> Investors are highly leveraged. Growth is elevated but unsustainable.</p>
+            <p><strong>Historical pattern:</strong> Typically precedes market peaks. Growth either cools gradually to 10-15% or spikes to 60%+ before crashing.</p>
+            <p><strong>Risk:</strong> Mean reversion likely within 6 months. Watch for deceleration signals.</p>
+        </div>
+        
+        <div id="extreme-popup" class="threshold-popup extreme">
+            <h4>Extreme (60%+)</h4>
+            <p><strong>What it means:</strong> Bubble conditions. Investors borrowing at unsustainable rates driven by euphoria.</p>
+            <p><strong>Historical pattern:</strong> Sharp reversals follow. Seen in March 2000 (dot-com), July 2007 (financial crisis), February 2021 (meme stocks).</p>
+            <p><strong>Risk:</strong> High probability of rapid deleveraging and market decline.</p>
         </div>
     </div>
     
@@ -325,7 +419,8 @@
     </footer>
     
     <script>
-        let baselinePopup, riskPopup;
+        let baselinePopup, riskPopup, lateCyclePopup, extremePopup, allData = [];
+        let lateCycleAnnotation, extremeAnnotation;
         
         async function loadData() {
             try {
@@ -333,115 +428,209 @@
                 const csvText = await response.text();
                 
                 const lines = csvText.split('\n');
-                const data = [];
+                allData = [];
                 
                 for (let i = 1; i < lines.length; i++) {
                     if (lines[i].trim()) {
                         const values = lines[i].split(',');
-                        data.push({
+                        allData.push({
                             date: values[0],
                             yoy: parseFloat(values[1])
                         });
                     }
                 }
                 
-                const recent = data.slice(-60);
-                const dates = recent.map(d => d.date);
-                const yoy = recent.map(d => d.yoy);
-                
-                // Main trace with improved colors
-                const trace1 = {
-                    x: dates,
-                    y: yoy,
-                    type: 'scatter',
-                    fill: 'tozeroy',
-                    fillcolor: 'rgba(100, 149, 237, 0.3)',
-                    line: {color: '#4169E1', width: 3},
-                    name: 'YoY Growth',
-                    hovertemplate: '<b>%{x}</b><br>Growth: %{y:.1f}%<extra></extra>'
-                };
-                
-                // Current position marker
-                const trace2 = {
-                    x: [dates[dates.length-1]],
-                    y: [yoy[yoy.length-1]],
-                    mode: 'markers',
-                    marker: {size: 12, color: '#DC143C', line: {width: 2, color: '#8B0000'}},
-                    name: 'Current',
-                    hovertemplate: '<b>Current Position</b><br>%{y:.1f}%<extra></extra>'
-                };
-                
-                const layout = {
-                    shapes: [
-                        // 30% threshold
-                        {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
-                         y0: 30, y1: 30, line: {dash: 'dot', color: '#FF8C00', width: 2}},
-                        // 60% threshold
-                        {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
-                         y0: 60, y1: 60, line: {dash: 'dot', color: '#DC143C', width: 2}},
-                        // Zero line
-                        {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
-                         y0: 0, y1: 0, line: {color: '#696969', width: 1}}
-                    ],
-                    annotations: [
-                        {x: dates[50], y: 31.5, text: '30% Late-Cycle', showarrow: false, 
-                         font: {color: '#FF8C00', size: 10, family: 'Arial, sans-serif'}},
-                        {x: dates[50], y: 61.5, text: '60% Extreme', showarrow: false, 
-                         font: {color: '#DC143C', size: 10, family: 'Arial, sans-serif'}}
-                    ],
-                    showlegend: false,
-                    margin: {t: 5, b: 40, l: 50, r: 10},
-                    xaxis: {
-                        title: '',
-                        showgrid: false,
-                        color: '#333'
-                    },
-                    yaxis: {
-                        title: 'YoY Growth (%)',
-                        showgrid: true,
-                        gridcolor: '#E8E8E8',
-                        color: '#333'
-                    },
-                    plot_bgcolor: '#FAFAFA',
-                    paper_bgcolor: '#fff',
-                    font: {family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', size: 11},
-                    hovermode: 'closest'
-                };
-                
-                const config = {
-                    responsive: true,
-                    displayModeBar: false
-                };
-                
-                Plotly.newPlot('main-chart', [trace1, trace2], layout, config);
-                
                 // Get popup elements
                 baselinePopup = document.getElementById('baseline-popup');
                 riskPopup = document.getElementById('risk-popup');
+                lateCyclePopup = document.getElementById('late-cycle-popup');
+                extremePopup = document.getElementById('extreme-popup');
                 
-                // Add hover event to show popups
-                const chartDiv = document.getElementById('main-chart');
-                chartDiv.on('plotly_hover', function(data) {
-                    const point = data.points[0];
-                    const yValue = point.y;
-                    
-                    // Show appropriate popup based on Y value
-                    if (yValue >= 10 && yValue <= 20) {
-                        showPopup(baselinePopup, data.event);
-                    } else if (yValue >= 50 && yValue <= 70) {
-                        showPopup(riskPopup, data.event);
-                    }
+                // Initial render with last 5 years
+                updateChart(60);
+                
+                // Setup slider
+                const slider = document.getElementById('timeRange');
+                const rangeValue = document.getElementById('rangeValue');
+                
+                // Set slider max to total data length
+                slider.max = allData.length;
+                
+                slider.addEventListener('input', function() {
+                    const months = parseInt(this.value);
+                    updateChart(months);
+                    updateRangeLabel(months);
                 });
                 
-                chartDiv.on('plotly_unhover', function() {
-                    hidePopups();
-                });
+                // Add mouse tracking for threshold line hovers
+                setupThresholdHovers();
                 
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('main-chart').innerHTML = 
                     '<p style="color: #999; text-align: center; padding: 50px;">Chart unavailable.</p>';
             }
+        }
+        
+        function setupThresholdHovers() {
+            const chartDiv = document.getElementById('main-chart');
+            
+            chartDiv.addEventListener('mousemove', function(e) {
+                const rect = chartDiv.getBoundingClientRect();
+                const relativeY = e.clientY - rect.top;
+                const chartHeight = rect.height;
+                
+                // Get y-axis range from Plotly
+                const layout = chartDiv.layout;
+                if (!layout || !layout.yaxis) return;
+                
+                const yMin = layout.yaxis.range[0];
+                const yMax = layout.yaxis.range[1];
+                const yRange = yMax - yMin;
+                
+                // Calculate value at mouse position
+                const yValue = yMax - (relativeY / chartHeight * yRange);
+                
+                // Show popup if near threshold lines (within ±3% range)
+                if (Math.abs(yValue - 30) < 3) {
+                    showThresholdPopup(lateCyclePopup, e);
+                    hideThresholdPopup(extremePopup);
+                } else if (Math.abs(yValue - 60) < 3) {
+                    showThresholdPopup(extremePopup, e);
+                    hideThresholdPopup(lateCyclePopup);
+                } else {
+                    hideThresholdPopup(lateCyclePopup);
+                    hideThresholdPopup(extremePopup);
+                }
+            });
+            
+            chartDiv.addEventListener('mouseleave', function() {
+                hideThresholdPopup(lateCyclePopup);
+                hideThresholdPopup(extremePopup);
+            });
+        }
+        
+        function showThresholdPopup(popup, event) {
+            popup.style.left = (event.pageX + 15) + 'px';
+            popup.style.top = (event.pageY - 60) + 'px';
+            popup.classList.add('show');
+        }
+        
+        function hideThresholdPopup(popup) {
+            popup.classList.remove('show');
+        }
+        
+        function updateRangeLabel(months) {
+            const rangeValue = document.getElementById('rangeValue');
+            if (months >= allData.length) {
+                rangeValue.textContent = 'All data';
+            } else {
+                const years = Math.floor(months / 12);
+                const remainingMonths = months % 12;
+                if (years > 0 && remainingMonths > 0) {
+                    rangeValue.textContent = `${years}y ${remainingMonths}m`;
+                } else if (years > 0) {
+                    rangeValue.textContent = `${years} year${years > 1 ? 's' : ''}`;
+                } else {
+                    rangeValue.textContent = `${months} months`;
+                }
+            }
+        }
+        
+        function updateChart(months) {
+            let data;
+            if (months >= allData.length) {
+                data = allData;
+            } else {
+                data = allData.slice(-months);
+            }
+            
+            const dates = data.map(d => d.date);
+            const yoy = data.map(d => d.yoy);
+            
+            // Main trace with improved colors
+            const trace1 = {
+                x: dates,
+                y: yoy,
+                type: 'scatter',
+                fill: 'tozeroy',
+                fillcolor: 'rgba(100, 149, 237, 0.3)',
+                line: {color: '#4169E1', width: 3},
+                name: 'YoY Growth',
+                hovertemplate: '<b>%{x}</b><br>Growth: %{y:.1f}%<extra></extra>'
+            };
+            
+            // Current position marker
+            const trace2 = {
+                x: [dates[dates.length-1]],
+                y: [yoy[yoy.length-1]],
+                mode: 'markers',
+                marker: {size: 12, color: '#DC143C', line: {width: 2, color: '#8B0000'}},
+                name: 'Current',
+                hovertemplate: '<b>Current Position</b><br>%{y:.1f}%<extra></extra>'
+            };
+            
+            const layout = {
+                shapes: [
+                    // 30% threshold
+                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
+                     y0: 30, y1: 30, line: {dash: 'dot', color: '#FF8C00', width: 2}},
+                    // 60% threshold
+                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
+                     y0: 60, y1: 60, line: {dash: 'dot', color: '#DC143C', width: 2}},
+                    // Zero line
+                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], 
+                     y0: 0, y1: 0, line: {color: '#696969', width: 1}}
+                ],
+                annotations: [
+                    {x: dates[Math.floor(dates.length * 0.85)], y: 31.5, text: '30% Late-Cycle', showarrow: false, 
+                     font: {color: '#FF8C00', size: 10, family: 'Arial, sans-serif'}},
+                    {x: dates[Math.floor(dates.length * 0.85)], y: 61.5, text: '60% Extreme', showarrow: false, 
+                     font: {color: '#DC143C', size: 10, family: 'Arial, sans-serif'}}
+                ],
+                showlegend: false,
+                margin: {t: 5, b: 40, l: 50, r: 10},
+                xaxis: {
+                    title: '',
+                    showgrid: false,
+                    color: '#333'
+                },
+                yaxis: {
+                    title: 'YoY Growth (%)',
+                    showgrid: true,
+                    gridcolor: '#E8E8E8',
+                    color: '#333'
+                },
+                plot_bgcolor: '#FAFAFA',
+                paper_bgcolor: '#fff',
+                font: {family: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', size: 11},
+                hovermode: 'closest'
+            };
+            
+            const config = {
+                responsive: true,
+                displayModeBar: false
+            };
+            
+            Plotly.react('main-chart', [trace1, trace2], layout, config);
+            
+            // Re-attach hover events for scenario popups
+            const chartDiv = document.getElementById('main-chart');
+            chartDiv.on('plotly_hover', function(data) {
+                const point = data.points[0];
+                const yValue = point.y;
+                
+                // Show appropriate popup based on Y value
+                if (yValue >= 10 && yValue <= 20) {
+                    showPopup(baselinePopup, data.event);
+                } else if (yValue >= 50 && yValue <= 70) {
+                    showPopup(riskPopup, data.event);
+                }
+            });
+            
+            chartDiv.on('plotly_unhover', function() {
+                hidePopups();
+            });
         }
         
         function showPopup(popup, event) {
