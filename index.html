@@ -114,36 +114,12 @@
         
         summary:hover { color: #1a1a1a; }
         
-        .chart-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .chart-controls label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-        }
-        
-        .chart-controls input[type="range"] {
-            flex: 1;
-            max-width: 300px;
-        }
-        
-        .chart-controls .range-value {
-            font-size: 12px;
-            color: #1a1a1a;
-            min-width: 80px;
-        }
-        
         .chart-section {
             margin-bottom: 15px;
         }
         
         .scenario-popup {
-            position: absolute;
+            position: fixed;
             background: white;
             border: 2px solid #1a1a1a;
             border-radius: 8px;
@@ -152,6 +128,7 @@
             z-index: 1000;
             min-width: 250px;
             display: none;
+            pointer-events: none;
         }
         
         .scenario-popup.show {
@@ -180,46 +157,58 @@
             margin-bottom: 4px;
         }
         
-        .threshold-popup {
-            position: absolute;
-            background: white;
-            border: 2px solid;
+        .threshold-info {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
             border-radius: 8px;
             padding: 12px 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
-            min-width: 280px;
-            display: none;
+            margin-top: 15px;
             font-size: 12px;
         }
         
-        .threshold-popup.show {
-            display: block;
-        }
-        
-        .threshold-popup.late-cycle {
-            border-color: #FF8C00;
-        }
-        
-        .threshold-popup.extreme {
-            border-color: #DC143C;
-        }
-        
-        .threshold-popup h4 {
+        .threshold-info h4 {
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 8px;
         }
         
-        .threshold-popup p {
+        .threshold-info p {
             margin-bottom: 6px;
             line-height: 1.5;
         }
         
-        .threshold-label {
-            cursor: help;
-            text-decoration: underline;
-            text-decoration-style: dotted;
+        .threshold-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .threshold-item {
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        .threshold-item.late-cycle {
+            background: #fff3cd;
+            border-left: 3px solid #FF8C00;
+        }
+        
+        .threshold-item.extreme {
+            background: #f8d7da;
+            border-left: 3px solid #DC143C;
+        }
+        
+        .threshold-item h5 {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .threshold-item p {
+            font-size: 11px;
+            line-height: 1.4;
+            margin-bottom: 4px;
         }
         
         .reference {
@@ -267,6 +256,9 @@
             .signal {
                 flex: 1 1 45%;
             }
+            .threshold-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 768px) {
@@ -280,13 +272,6 @@
             }
             .reference-grid {
                 grid-template-columns: 1fr;
-            }
-            .chart-controls {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .chart-controls input[type="range"] {
-                max-width: 100%;
             }
         }
     </style>
@@ -335,53 +320,48 @@
     <details>
         <summary>How to read this chart</summary>
         <div style="padding: 8px 0;">
-            <p>Blue area = YoY growth. Red dot = current. Above 0% = expansion. Below 0% = contraction. Hover over dotted lines to see what "Late-Cycle" and "Extreme" mean. Hover over the chart area to see historical outcomes.</p>
+            <p>Blue area = YoY growth. Red dot = current position. Above 0% = expansion. Below 0% = contraction. Drag the slider below the chart to zoom into specific time periods. Click the chart area between 10-20% or 50-70% to see what historically happens at those levels.</p>
         </div>
     </details>
     
-    <div class="chart-controls">
-        <label for="timeRange">Time Range:</label>
-        <input type="range" id="timeRange" min="12" max="0" value="60" step="12">
-        <span class="range-value" id="rangeValue">5 years</span>
-    </div>
-    
     <div class="chart-section">
-        <div id="main-chart" style="height: 400px; position: relative;"></div>
+        <div id="main-chart" style="height: 450px; position: relative;"></div>
         
-        <!-- Scenario popups -->
+        <!-- Scenario popups (only show when clicking specific regions) -->
         <div id="baseline-popup" class="scenario-popup">
-            <h3>Baseline (70%)</h3>
-            <p>Gradual normalization</p>
+            <h3>Baseline Scenario (70%)</h3>
+            <p>When growth is 10-20%: Gradual normalization</p>
             <ul>
-                <li>Cools to 10-15%</li>
-                <li>No crash, reversion</li>
-                <li>Avg: 11.7% (6M)</li>
+                <li>Growth cools to 10-15%</li>
+                <li>No crash, just mean reversion</li>
+                <li>Historical avg: 11.7% after 6 months</li>
             </ul>
         </div>
         
         <div id="risk-popup" class="scenario-popup">
-            <h3>Risk (30%)</h3>
-            <p>Spike then reversal</p>
+            <h3>Risk Scenario (30%)</h3>
+            <p>When growth spikes to 50-70%: Euphoria then reversal</p>
             <ul>
-                <li>Spike to 50-60%</li>
-                <li>Sharp decline</li>
-                <li>2000, 2007, 2021</li>
+                <li>Growth accelerates to 50-60%</li>
+                <li>Then sharp decline follows</li>
+                <li>Seen in: 2000, 2007, 2021</li>
             </ul>
         </div>
-        
-        <!-- Threshold explanation popups -->
-        <div id="late-cycle-popup" class="threshold-popup late-cycle">
-            <h4>Late-Cycle (30-60%)</h4>
-            <p><strong>What it means:</strong> Investors are highly leveraged. Growth is elevated but unsustainable.</p>
-            <p><strong>Historical pattern:</strong> Typically precedes market peaks. Growth either cools gradually to 10-15% or spikes to 60%+ before crashing.</p>
-            <p><strong>Risk:</strong> Mean reversion likely within 6 months. Watch for deceleration signals.</p>
-        </div>
-        
-        <div id="extreme-popup" class="threshold-popup extreme">
-            <h4>Extreme (60%+)</h4>
-            <p><strong>What it means:</strong> Bubble conditions. Investors borrowing at unsustainable rates driven by euphoria.</p>
-            <p><strong>Historical pattern:</strong> Sharp reversals follow. Seen in March 2000 (dot-com), July 2007 (financial crisis), February 2021 (meme stocks).</p>
-            <p><strong>Risk:</strong> High probability of rapid deleveraging and market decline.</p>
+    </div>
+    
+    <!-- Threshold explanations below chart -->
+    <div class="threshold-info">
+        <h4>What the Thresholds Mean</h4>
+        <div class="threshold-grid">
+            <div class="threshold-item late-cycle">
+                <h5>Late-Cycle (30-60%)</h5>
+                <p><strong>Investors are highly leveraged.</strong> Growth is elevated but unsustainable. Historically precedes market peaks. Expect either gradual cooling to 10-15% or spike to 60%+ before crash.</p>
+            </div>
+            
+            <div class="threshold-item extreme">
+                <h5>Extreme (60%+)</h5>
+                <p><strong>Bubble conditions.</strong> Investors borrowing at unsustainable rates. Sharp reversals follow. Examples: March 2000 (dot-com), July 2007 (crisis), Feb 2021 (meme stocks).</p>
+            </div>
         </div>
     </div>
     
@@ -419,8 +399,7 @@
     </footer>
     
     <script>
-        let baselinePopup, riskPopup, lateCyclePopup, extremePopup, allData = [];
-        let lateCycleAnnotation, extremeAnnotation;
+        let baselinePopup, riskPopup, allData = [];
         
         async function loadData() {
             try {
@@ -443,27 +422,9 @@
                 // Get popup elements
                 baselinePopup = document.getElementById('baseline-popup');
                 riskPopup = document.getElementById('risk-popup');
-                lateCyclePopup = document.getElementById('late-cycle-popup');
-                extremePopup = document.getElementById('extreme-popup');
                 
-                // Initial render with last 5 years
-                updateChart(60);
-                
-                // Setup slider
-                const slider = document.getElementById('timeRange');
-                const rangeValue = document.getElementById('rangeValue');
-                
-                // Set slider max to total data length
-                slider.max = allData.length;
-                
-                slider.addEventListener('input', function() {
-                    const months = parseInt(this.value);
-                    updateChart(months);
-                    updateRangeLabel(months);
-                });
-                
-                // Add mouse tracking for threshold line hovers
-                setupThresholdHovers();
+                // Initial render with all data
+                updateChart();
                 
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -472,81 +433,9 @@
             }
         }
         
-        function setupThresholdHovers() {
-            const chartDiv = document.getElementById('main-chart');
-            
-            chartDiv.addEventListener('mousemove', function(e) {
-                const rect = chartDiv.getBoundingClientRect();
-                const relativeY = e.clientY - rect.top;
-                const chartHeight = rect.height;
-                
-                // Get y-axis range from Plotly
-                const layout = chartDiv.layout;
-                if (!layout || !layout.yaxis) return;
-                
-                const yMin = layout.yaxis.range[0];
-                const yMax = layout.yaxis.range[1];
-                const yRange = yMax - yMin;
-                
-                // Calculate value at mouse position
-                const yValue = yMax - (relativeY / chartHeight * yRange);
-                
-                // Show popup if near threshold lines (within ±3% range)
-                if (Math.abs(yValue - 30) < 3) {
-                    showThresholdPopup(lateCyclePopup, e);
-                    hideThresholdPopup(extremePopup);
-                } else if (Math.abs(yValue - 60) < 3) {
-                    showThresholdPopup(extremePopup, e);
-                    hideThresholdPopup(lateCyclePopup);
-                } else {
-                    hideThresholdPopup(lateCyclePopup);
-                    hideThresholdPopup(extremePopup);
-                }
-            });
-            
-            chartDiv.addEventListener('mouseleave', function() {
-                hideThresholdPopup(lateCyclePopup);
-                hideThresholdPopup(extremePopup);
-            });
-        }
-        
-        function showThresholdPopup(popup, event) {
-            popup.style.left = (event.pageX + 15) + 'px';
-            popup.style.top = (event.pageY - 60) + 'px';
-            popup.classList.add('show');
-        }
-        
-        function hideThresholdPopup(popup) {
-            popup.classList.remove('show');
-        }
-        
-        function updateRangeLabel(months) {
-            const rangeValue = document.getElementById('rangeValue');
-            if (months >= allData.length) {
-                rangeValue.textContent = 'All data';
-            } else {
-                const years = Math.floor(months / 12);
-                const remainingMonths = months % 12;
-                if (years > 0 && remainingMonths > 0) {
-                    rangeValue.textContent = `${years}y ${remainingMonths}m`;
-                } else if (years > 0) {
-                    rangeValue.textContent = `${years} year${years > 1 ? 's' : ''}`;
-                } else {
-                    rangeValue.textContent = `${months} months`;
-                }
-            }
-        }
-        
-        function updateChart(months) {
-            let data;
-            if (months >= allData.length) {
-                data = allData;
-            } else {
-                data = allData.slice(-months);
-            }
-            
-            const dates = data.map(d => d.date);
-            const yoy = data.map(d => d.yoy);
+        function updateChart() {
+            const dates = allData.map(d => d.date);
+            const yoy = allData.map(d => d.yoy);
             
             // Main trace with improved colors
             const trace1 = {
@@ -583,23 +472,32 @@
                      y0: 0, y1: 0, line: {color: '#696969', width: 1}}
                 ],
                 annotations: [
-                    {x: dates[Math.floor(dates.length * 0.85)], y: 31.5, text: '30% Late-Cycle', showarrow: false, 
+                    {x: dates[Math.floor(dates.length * 0.9)], y: 31.5, text: '30%', showarrow: false, 
                      font: {color: '#FF8C00', size: 10, family: 'Arial, sans-serif'}},
-                    {x: dates[Math.floor(dates.length * 0.85)], y: 61.5, text: '60% Extreme', showarrow: false, 
+                    {x: dates[Math.floor(dates.length * 0.9)], y: 61.5, text: '60%', showarrow: false, 
                      font: {color: '#DC143C', size: 10, family: 'Arial, sans-serif'}}
                 ],
                 showlegend: false,
-                margin: {t: 5, b: 40, l: 50, r: 10},
+                margin: {t: 5, b: 60, l: 50, r: 10},
                 xaxis: {
                     title: '',
                     showgrid: false,
-                    color: '#333'
+                    color: '#333',
+                    rangeslider: {
+                        visible: true,
+                        thickness: 0.05,
+                        bgcolor: '#f8f9fa',
+                        bordercolor: '#ddd',
+                        borderwidth: 1
+                    },
+                    type: 'date'
                 },
                 yaxis: {
                     title: 'YoY Growth (%)',
                     showgrid: true,
                     gridcolor: '#E8E8E8',
-                    color: '#333'
+                    color: '#333',
+                    fixedrange: false
                 },
                 plot_bgcolor: '#FAFAFA',
                 paper_bgcolor: '#fff',
@@ -612,15 +510,15 @@
                 displayModeBar: false
             };
             
-            Plotly.react('main-chart', [trace1, trace2], layout, config);
+            Plotly.newPlot('main-chart', [trace1, trace2], layout, config);
             
-            // Re-attach hover events for scenario popups
+            // Add click event to show scenario popups
             const chartDiv = document.getElementById('main-chart');
-            chartDiv.on('plotly_hover', function(data) {
+            chartDiv.on('plotly_click', function(data) {
                 const point = data.points[0];
                 const yValue = point.y;
                 
-                // Show appropriate popup based on Y value
+                // Show popup based on clicked Y value
                 if (yValue >= 10 && yValue <= 20) {
                     showPopup(baselinePopup, data.event);
                 } else if (yValue >= 50 && yValue <= 70) {
@@ -628,15 +526,18 @@
                 }
             });
             
-            chartDiv.on('plotly_unhover', function() {
-                hidePopups();
+            // Click anywhere else to hide popups
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#main-chart') && !e.target.closest('.scenario-popup')) {
+                    hidePopups();
+                }
             });
         }
         
         function showPopup(popup, event) {
             hidePopups();
-            popup.style.left = (event.pageX + 15) + 'px';
-            popup.style.top = (event.pageY - 50) + 'px';
+            popup.style.left = (event.clientX + 15) + 'px';
+            popup.style.top = (event.clientY + 15) + 'px';
             popup.classList.add('show');
         }
         
