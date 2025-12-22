@@ -182,6 +182,39 @@
             line-height: 1.4;
         }
         
+        .state-legend-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 8px;
+        }
+        
+        .state-group {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .state-group h4 {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1e293b;
+            letter-spacing: -0.01em;
+        }
+        
+        .state-item {
+            font-size: 10px;
+            line-height: 1.5;
+            margin-bottom: 3px;
+            color: #475569;
+        }
+        
+        .state-item strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+        
         .reference {
             background: #fff;
             padding: 10px 12px;
@@ -243,6 +276,9 @@
             }
             .momentum-grid {
                 grid-template-columns: repeat(3, 1fr);
+            }
+            .state-legend-grid {
+                grid-template-columns: 1fr;
             }
             .reference-grid {
                 grid-template-columns: 1fr;
@@ -313,6 +349,42 @@
     <div class="chart-section">
         <div id="forecast-chart" style="height: 520px;"></div>
     </div>
+    
+    <details>
+        <summary>State definitions (12 total)</summary>
+        <div style="padding: 10px 0;">
+            <div class="state-legend-grid">
+                <div class="state-group">
+                    <h4>Expansion (E) - YoY ≥ 30%</h4>
+                    <div class="state-item"><strong>E_up:</strong> Accelerating (ΔYoY ≥ +2pp/mo)</div>
+                    <div class="state-item"><strong>E_flat:</strong> Stable momentum (-2 < ΔYoY < +2pp/mo)</div>
+                    <div class="state-item"><strong>E_down:</strong> Decelerating (ΔYoY ≤ -2pp/mo)</div>
+                </div>
+                
+                <div class="state-group">
+                    <h4>Growth (G) - 0% ≤ YoY < 30%</h4>
+                    <div class="state-item"><strong>G_up:</strong> Accelerating (ΔYoY ≥ +2pp/mo)</div>
+                    <div class="state-item"><strong>G_flat:</strong> Stable momentum (-2 < ΔYoY < +2pp/mo)</div>
+                    <div class="state-item"><strong>G_down:</strong> Decelerating (ΔYoY ≤ -2pp/mo)</div>
+                </div>
+                
+                <div class="state-group">
+                    <h4>Contraction (C) - -30% < YoY < 0%</h4>
+                    <div class="state-item"><strong>C_up:</strong> Improving (ΔYoY ≥ +2pp/mo)</div>
+                    <div class="state-item"><strong>C_flat:</strong> Stable momentum (-2 < ΔYoY < +2pp/mo)</div>
+                    <div class="state-item"><strong>C_down:</strong> Worsening (ΔYoY ≤ -2pp/mo)</div>
+                </div>
+                
+                <div class="state-group">
+                    <h4>Crisis (D) - YoY ≤ -30%</h4>
+                    <div class="state-item"><strong>D_up:</strong> Recovering (ΔYoY ≥ +2pp/mo)</div>
+                    <div class="state-item"><strong>D_flat:</strong> Stable momentum (-2 < ΔYoY < +2pp/mo)</div>
+                    <div class="state-item"><strong>D_down:</strong> Deepening (ΔYoY ≤ -2pp/mo)</div>
+                </div>
+            </div>
+            <p style="margin-top: 10px; font-size: 10px; color: #64748b;"><strong>ΔYoY</strong> = rate of change in YoY growth. <strong>pp/mo</strong> = percentage points per month. States combine regime zones (E/G/C/D) with momentum direction (up/flat/down).</p>
+        </div>
+    </details>
     
     <div class="reference">
         <div class="reference-grid">
