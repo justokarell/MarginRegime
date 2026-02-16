@@ -1,0 +1,14 @@
+{
+  "current_yoy": 36.3,
+  "change_1m": -0.01,
+  "change_2m": -8.86,
+  "change_3m": -2.22,
+  "status_1m": "decelerating",
+  "status_2m": "decelerating",
+  "status_3m": "decelerating",
+  "second_derivative": -1.86,
+  "percentile": 89.9,
+  "phase": "late",
+  "regime_label": "Late-Cycle Expansion",
+  "date": "2025-12-01"
+}

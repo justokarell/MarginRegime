@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Margin Debt Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+            line-height: 1.3;
+            padding: 12px 25px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        header {
+            border-bottom: 2px solid #1a1a1a;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        
+        h1 { font-size: 20px; font-weight: 600; margin-bottom: 2px; letter-spacing: -0.02em; }
+        .subtitle { color: #666; font-size: 11px; }
+        
+        .top-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .status {
+            background: #fff;
+            border-left: 3px solid #ffc107;
+            padding: 12px 15px;
+            display: grid;
+            grid-template-columns: 120px 1fr 180px;
+            gap: 15px;
+            align-items: center;
+            flex: 2;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .metric-display {
+            text-align: center;
+        }
+        
+        .regime-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+        }
+        
+        .metric {
+            font-size: 32px;
+            font-weight: 300;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+            letter-spacing: -0.03em;
+        }
+        
+        .metric-sub {
+            font-size: 10px;
+            color: #999;
+        }
+        
+        .interpretation {
+            font-size: 11px;
+            line-height: 1.4;
+        }
+        
+        .interpretation p {
+            margin-bottom: 4px;
+        }
+        
+        .momentum-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+        
+        .momentum-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .momentum-label {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+        
+        .momentum-value {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        .momentum-value.accel {
+            color: #10b981;
+        }
+        
+        .momentum-value.decel {
+            color: #ef4444;
+        }
+        
+        .momentum-value.neutral {
+            color: #64748b;
+        }
+        
+        .signal {
+            border-left: 3px solid #dc3545;
+            padding: 10px 12px;
+            background: #fff;
+            flex: 1;
+            min-width: 240px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .signal h3 {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: -0.01em;
+        }
+        
+        .signal p {
+            font-size: 11px;
+            margin-bottom: 4px;
+            line-height: 1.35;
+        }
+        
+        .warning { border-left-color: #ffc107; }
+        
+        details {
+            margin-bottom: 8px;
+            font-size: 11px;
+        }
+        
+        summary {
+            font-weight: 600;
+            padding: 4px 0;
+            color: #666;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        
+        summary:hover { color: #1a1a1a; }
+        
+        .chart-section {
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            font-size: 15px;
+            font-weight: 600;
+            margin: 12px 0 6px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e0e0e0;
+            letter-spacing: -0.02em;
+        }
+        
+        .chart-subtitle {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .state-legend-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 8px;
+        }
+        
+        .state-group {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .state-group h4 {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1e293b;
+            letter-spacing: -0.01em;
+        }
+        
+        .state-item {
+            font-size: 10px;
+            line-height: 1.5;
+            margin-bottom: 3px;
+            color: #475569;
+        }
+        
+        .state-item strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+        
+        .reference {
+            background: #fff;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .reference-item h3 {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+        }
+        
+        .reference-item p, .reference-item ul {
+            font-size: 10px;
+            line-height: 1.3;
+        }
+        
+        .reference-item ul {
+            margin-left: 10px;
+        }
+        
+        footer {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 8px;
+            color: #666;
+            font-size: 10px;
+            text-align: center;
+        }
+        
+        @media (max-width: 1200px) {
+            .top-section {
+                flex-wrap: wrap;
+            }
+            .status {
+                flex: 1 1 100%;
+                grid-template-columns: 120px 1fr 180px;
+            }
+            .signal {
+                flex: 1 1 45%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .top-section {
+                flex-direction: column;
+            }
+            .status {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .momentum-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .state-legend-grid {
+                grid-template-columns: 1fr;
+            }
+            .reference-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Margin Debt Monitor</h1>
+        <p class="subtitle">Last updated: <span id="last-updated">November 2025</span></p>
+    </header>
+    
+    <div class="top-section">
+        <div class="status">
+            <div class="metric-display">
+                <div class="regime-label" id="regime-label">Late-Cycle Expansion</div>
+                <div class="metric" id="current-yoy">+36.3%</div>
+                <div class="metric-sub">YoY change in margin debt</div>
+            </div>
+            
+            <div class="interpretation">
+                <p><strong>Position:</strong> Near the end of a growth phase.</p>
+                <p><strong>Risk:</strong> Elevated. Typically reverts to 10-15% within six months.</p>
+                <p><strong>Outlook:</strong> Decelerating. Top 10% historically.</p>
+            </div>
+            
+            <div class="momentum-grid">
+                <div class="momentum-item">
+                    <div class="momentum-label">1mo</div>
+                    <div class="momentum-value decel" id="change-1m">-8.9pp</div>
+                </div>
+                <div class="momentum-item">
+                    <div class="momentum-label">2mo</div>
+                    <div class="momentum-value decel" id="change-2m">-2.2pp</div>
+                </div>
+                <div class="momentum-item">
+                    <div class="momentum-label">3mo</div>
+                    <div class="momentum-value accel" id="change-3m">+3.4pp</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="signal">
+            <h3>Growth Deceleration</h3>
+            <p>Margin debt is still growing year-over-year, but the rate of growth is slowing down. The second derivative (rate of change of the growth rate) is <span id="second-derivative">-7.8</span>, indicating negative acceleration.</p>
+            <p>This deceleration pattern historically appears before major market peaks, as seen in 2000, 2007, and 2021.</p>
+        </div>
+        
+        <div class="signal warning">
+            <h3>Elevated Growth Levels</h3>
+            <p>Current year-over-year growth of <span id="current-yoy-inline">36.3</span>% is in the <span id="percentile">90</span>th percentile of all readings since 1997. This means only 10% of historical periods showed higher growth rates.</p>
+            <p>From this percentile level, margin debt growth typically mean-reverts to 10-15% within six months as investors reduce leverage.</p>
+        </div>
+    </div>
+    
+    <details>
+        <summary>What is margin debt?</summary>
+        <div style="padding: 8px 0;">
+            <p>Money investors borrow from brokers to buy stocks. Rising = confidence/risk-taking. Falling = deleveraging. Peaks often precede market tops (2000, 2007, 2021).</p>
+        </div>
+    </details>
+    
+    <h2>Regime Forecast Analysis</h2>
+    
+    <p class="chart-subtitle">Historical YoY growth with regime zones and predicted next states. Hover over any point to see top 5 predicted outcomes and probabilities. Background colors: Green (Expansion), Blue (Growth), Orange (Contraction), Red (Crisis).</p>
+    
+    <div class="chart-section">
+        <div id="forecast-chart" style="height: 520px;"></div>
+    </div>
+    
+    <details>
+        <summary>State definitions (12 total)</summary>
+        <div style="padding: 10px 0;">
+            <div class="state-legend-grid">
+                <div class="state-group">
+                    <h4>Expansion (E) - YoY ≥ 30%</h4>
+                    <div class="state-item"><strong>E_up:</strong> Accelerating (ΔYoY ≥ +2pp/mo)</div>
+                    <div class="state-item"><strong>E_flat:</strong> Stable momentum (-2 < ΔYoY < +2pp/mo)</div>
+                    <div class="state-item"><strong>E_down:</strong> Decelerating (ΔYoY ≤ -2pp/mo)</div>
+                </div>
+                
+                <div class="state-group">
+                    <h4>Growth (G) - 0% ≤ YoY < 30%</h4>
+                    <div class="state-item"><strong>G_up:</strong> Accelerating (ΔYoY ≥ +2pp/mo)</div>
+                    <div class="state-item"><strong>G_flat:</strong> Stable momentum (-2 < ΔYoY < +2pp/mo)</div>
+                    <div class="state-item"><strong>G_down:</strong> Decelerating (ΔYoY ≤ -2pp/mo)</div>
+                </div>
+                
+                <div class="state-group">
+                    <h4>Contraction (C) - -30% < YoY < 0%</h4>
+                    <div class="state-item"><strong>C_up:</strong> Improving (ΔYoY ≥ +2pp/mo)</div>
+                    <div class="state-item"><strong>C_flat:</strong> Stable momentum (-2 < ΔYoY < +2pp/mo)</div>
+                    <div class="state-item"><strong>C_down:</strong> Worsening (ΔYoY ≤ -2pp/mo)</div>
+                </div>
+                
+                <div class="state-group">
+                    <h4>Crisis (D) - YoY ≤ -30%</h4>
+                    <div class="state-item"><strong>D_up:</strong> Recovering (ΔYoY ≥ +2pp/mo)</div>
+                    <div class="state-item"><strong>D_flat:</strong> Stable momentum (-2 < ΔYoY < +2pp/mo)</div>
+                    <div class="state-item"><strong>D_down:</strong> Deepening (ΔYoY ≤ -2pp/mo)</div>
+                </div>
+            </div>
+            <p style="margin-top: 10px; font-size: 10px; color: #64748b;"><strong>ΔYoY</strong> = rate of change in YoY growth. <strong>pp/mo</strong> = percentage points per month. States combine regime zones (E/G/C/D) with momentum direction (up/flat/down).</p>
+        </div>
+    </details>
+    
+    <div class="reference">
+        <div class="reference-grid">
+            <div class="reference-item">
+                <h3>Cycle Phases</h3>
+                <ul>
+                    <li>0-20%: Early</li>
+                    <li>20-30%: Mid</li>
+                    <li>30-60%: Late</li>
+                    <li>60%+: Extreme</li>
+                </ul>
+            </div>
+            
+            <div class="reference-item">
+                <h3>Current</h3>
+                <p>36.3% growth = late-cycle. Deceleration active.</p>
+            </div>
+            
+            <div class="reference-item">
+                <h3>Data Source</h3>
+                <p>FINRA margin statistics, 1997-2025.</p>
+            </div>
+            
+            <div class="reference-item">
+                <h3>Update</h3>
+                <p>Monthly, mid-month.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Leading indicator, not a trading signal. One input for risk assessment.</p>
+    </footer>
+    
+    <script>
+        async function loadData() {
+            try {
+                // Load all datasets
+                const [marginResponse, forecastResponse, metricsResponse] = await Promise.all([
+                    fetch('margin_debt_data.json'),
+                    fetch('forecast_data.json'),
+                    fetch('current_metrics.json')
+                ]);
+                
+                const marginData = await marginResponse.json();
+                const forecastData = await forecastResponse.json();
+                const metrics = await metricsResponse.json();
+                
+                // Update current metrics display
+                updateMetricsDisplay(metrics);
+                
+                // Create a map for quick forecast lookup
+                const forecastMap = new Map(forecastData.map(f => [f.date, f]));
+                
+                // Render forecast chart
+                renderForecastChart(marginData, forecastMap);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('forecast-chart').innerHTML = 
+                    '<p style="color: #999; text-align: center; padding: 50px;">Chart unavailable.</p>';
+            }
+        }
+        
+        function updateMetricsDisplay(metrics) {
+            // Update current YoY
+            document.getElementById('current-yoy').textContent = 
+                (metrics.current_yoy > 0 ? '+' : '') + metrics.current_yoy.toFixed(1) + '%';
+            
+            // Update header last-updated text (Month YYYY)
+            const lastUpdatedEl = document.getElementById('last-updated');
+            if (lastUpdatedEl && metrics.date) {
+                const d = new Date(metrics.date);
+                lastUpdatedEl.textContent = d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+            }
+
+            // Update regime label
+            const regimeEl = document.getElementById('regime-label');
+            if (regimeEl && metrics.regime_label) {
+                regimeEl.textContent = metrics.regime_label;
+            }
+
+            // Update inline analysis callouts
+            const yoyInline = document.getElementById('current-yoy-inline');
+            if (yoyInline) {
+                yoyInline.textContent = metrics.current_yoy.toFixed(1);
+            }
+            const pctEl = document.getElementById('percentile');
+            if (pctEl && metrics.percentile !== undefined) {
+                pctEl.textContent = metrics.percentile.toFixed(1);
+            }
+            const accelEl = document.getElementById('second-derivative');
+            if (accelEl && metrics.second_derivative !== undefined) {
+                accelEl.textContent = metrics.second_derivative.toFixed(1);
+            }
+            
+            // Update momentum indicators
+            const change1m = document.getElementById('change-1m');
+            const change2m = document.getElementById('change-2m');
+            const change3m = document.getElementById('change-3m');
+            
+            change1m.textContent = (metrics.change_1m > 0 ? '+' : '') + metrics.change_1m.toFixed(1) + 'pp';
+            change1m.className = 'momentum-value ' + (metrics.change_1m > 0.1 ? 'accel' : metrics.change_1m < -0.1 ? 'decel' : 'neutral');
+            
+            change2m.textContent = (metrics.change_2m > 0 ? '+' : '') + metrics.change_2m.toFixed(1) + 'pp';
+            change2m.className = 'momentum-value ' + (metrics.change_2m > 0.1 ? 'accel' : metrics.change_2m < -0.1 ? 'decel' : 'neutral');
+            
+            change3m.textContent = (metrics.change_3m > 0 ? '+' : '') + metrics.change_3m.toFixed(1) + 'pp';
+            change3m.className = 'momentum-value ' + (metrics.change_3m > 0.1 ? 'accel' : metrics.change_3m < -0.1 ? 'decel' : 'neutral');
+        }
+        
+        function renderForecastChart(marginData, forecastMap) {
+            // Build hover text with predictions
+            const hoverText = marginData.map(d => {
+                const forecast = forecastMap.get(d.date);
+                
+                if (forecast) {
+                    let text = `<b>Date: ${d.date}</b><br>`;
+                    text += `Current State: ${d.state}<br>`;
+                    text += `YoY: ${d.yoy_ma.toFixed(1)}%<br>`;
+                    text += `<br><b>Predicted Next State:</b> ${forecast.pred_state} (${(forecast.confidence * 100).toFixed(1)}%)<br>`;
+                    text += `<br><b>Top Predictions:</b><br>`;
+                    
+                    for (let i = 1; i <= 5; i++) {
+                        const state = forecast[`top${i}_state`];
+                        const prob = forecast[`top${i}_prob`];
+                        if (state && prob > 0) {
+                            text += `  ${i}. ${state}: ${(prob * 100).toFixed(1)}%<br>`;
+                        }
+                    }
+                    
+                    text += `<br><b>Regime Probabilities:</b><br>`;
+                    if (forecast.prob_E > 0) text += `  Expansion: ${(forecast.prob_E * 100).toFixed(1)}%<br>`;
+                    if (forecast.prob_G > 0) text += `  Growth: ${(forecast.prob_G * 100).toFixed(1)}%<br>`;
+                    if (forecast.prob_C > 0) text += `  Contraction: ${(forecast.prob_C * 100).toFixed(1)}%<br>`;
+                    if (forecast.prob_D > 0) text += `  Crisis: ${(forecast.prob_D * 100).toFixed(1)}%<br>`;
+                    
+                    return text;
+                } else {
+                    return `<b>Date: ${d.date}</b><br>Current State: ${d.state}<br>YoY: ${d.yoy_ma.toFixed(1)}%<br><br><i>No forecast available</i>`;
+                }
+            });
+            
+            const dates = marginData.map(d => d.date);
+            const yoy = marginData.map(d => d.yoy_ma);
+            
+            const trace = {
+                x: dates,
+                y: yoy,
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#2563eb', width: 3.5, shape: 'spline'},
+                name: 'YoY% (smoothed)',
+                hovertext: hoverText,
+                hoverinfo: 'text',
+                fill: 'tozeroy',
+                fillcolor: 'rgba(37, 99, 235, 0.08)'
+            };
+            
+            const layout = {
+                shapes: [
+                    {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: 30, y1: 100, 
+                     fillcolor: '#10b981', opacity: 0.08, line: {width: 0}, layer: 'below'},
+                    {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: 0, y1: 30, 
+                     fillcolor: '#3b82f6', opacity: 0.06, line: {width: 0}, layer: 'below'},
+                    {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: -30, y1: 0, 
+                     fillcolor: '#f59e0b', opacity: 0.08, line: {width: 0}, layer: 'below'},
+                    {type: 'rect', x0: dates[0], x1: dates[dates.length-1], y0: -100, y1: -30, 
+                     fillcolor: '#ef4444', opacity: 0.08, line: {width: 0}, layer: 'below'},
+                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], y0: 30, y1: 30, 
+                     line: {dash: 'dash', color: '#10b981', width: 2, opacity: 0.7}},
+                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], y0: 0, y1: 0, 
+                     line: {dash: 'solid', color: '#64748b', width: 1.5, opacity: 0.5}},
+                    {type: 'line', x0: dates[0], x1: dates[dates.length-1], y0: -30, y1: -30, 
+                     line: {dash: 'dash', color: '#ef4444', width: 2, opacity: 0.7}}
+                ],
+                annotations: [
+                    {x: dates[dates.length - 10], y: 32, text: 'Expansion (+30%)', 
+                     showarrow: false, xanchor: 'right', font: {size: 10, color: '#059669', family: 'Space Grotesk, sans-serif', weight: 500}},
+                    {x: dates[dates.length - 10], y: -32, text: 'Crisis (-30%)', 
+                     showarrow: false, xanchor: 'right', font: {size: 10, color: '#dc2626', family: 'Space Grotesk, sans-serif', weight: 500}}
+                ],
+                title: {
+                    text: 'Margin Debt Regime Analysis - YoY% Growth & Predicted Next Regime', 
+                    font: {size: 15, family: 'Space Grotesk, Inter, sans-serif', weight: 600, color: '#0f172a'}
+                },
+                xaxis: {
+                    title: {text: 'Date', font: {size: 12, family: 'Space Grotesk, sans-serif', color: '#475569'}},
+                    showgrid: false,
+                    showline: true,
+                    linecolor: '#e2e8f0',
+                    linewidth: 2,
+                    tickfont: {size: 10, family: 'Space Grotesk, sans-serif', color: '#64748b'}
+                },
+                yaxis: {
+                    title: {text: 'YoY% Change', font: {size: 12, family: 'Space Grotesk, sans-serif', color: '#475569'}},
+                    showgrid: true,
+                    gridcolor: '#f1f5f9',
+                    gridwidth: 1,
+                    showline: true,
+                    linecolor: '#e2e8f0',
+                    linewidth: 2,
+                    tickfont: {size: 10, family: 'Space Grotesk, sans-serif', color: '#64748b'},
+                    zeroline: false
+                },
+                hovermode: 'x unified',
+                hoverlabel: {
+                    bgcolor: '#ffffff',
+                    bordercolor: '#e2e8f0',
+                    font: {size: 11, family: 'Space Grotesk, sans-serif', color: '#1e293b'}
+                },
+                showlegend: true,
+                plot_bgcolor: '#ffffff',
+                paper_bgcolor: '#fafafa',
+                height: 520,
+                margin: {l: 55, r: 25, t: 50, b: 45},
+                legend: {
+                    orientation: 'v', 
+                    yanchor: 'top', 
+                    y: 0.98, 
+                    xanchor: 'left', 
+                    x: 0.02,
+                    bgcolor: 'rgba(255, 255, 255, 0.95)',
+                    bordercolor: '#e2e8f0',
+                    borderwidth: 1,
+                    font: {size: 10, family: 'Space Grotesk, sans-serif', color: '#475569'}
+                }
+            };
+            
+            // Add legend items for regimes with modern colors
+            const legendTraces = [
+                trace,
+                {x: [null], y: [null], mode: 'markers', 
+                 marker: {size: 12, color: '#10b981', opacity: 0.7, symbol: 'square'}, 
+                 name: 'Expansion (E)', showlegend: true},
+                {x: [null], y: [null], mode: 'markers', 
+                 marker: {size: 12, color: '#3b82f6', opacity: 0.7, symbol: 'square'}, 
+                 name: 'Growth (G)', showlegend: true},
+                {x: [null], y: [null], mode: 'markers', 
+                 marker: {size: 12, color: '#f59e0b', opacity: 0.7, symbol: 'square'}, 
+                 name: 'Contraction (C)', showlegend: true},
+                {x: [null], y: [null], mode: 'markers', 
+                 marker: {size: 12, color: '#ef4444', opacity: 0.7, symbol: 'square'}, 
+                 name: 'Crisis (D)', showlegend: true}
+            ];
+            
+            Plotly.newPlot('forecast-chart', legendTraces, layout, {responsive: true, displayModeBar: false});
+        }
+        
+        window.addEventListener('load', loadData);
+    </script>
+</body>
+</html>
