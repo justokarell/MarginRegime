@@ -457,7 +457,9 @@
             // Update header last-updated text (Month YYYY)
             const lastUpdatedEl = document.getElementById('last-updated');
             if (lastUpdatedEl && metrics.date) {
-                const d = new Date(metrics.date);
+                // Parse YYYY-MM-DD safely across browsers (incl. Safari)
+                const [yy, mm] = metrics.date.split('-').map(Number);
+                const d = new Date(yy, (mm || 1) - 1, 1);
                 lastUpdatedEl.textContent = d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
             }
 
